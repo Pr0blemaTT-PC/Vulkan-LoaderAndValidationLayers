@@ -3,24 +3,17 @@
     <comment>
 Copyright (c) 2015-2017 The Khronos Group Inc.
 
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and/or associated documentation files (the
-"Materials"), to deal in the Materials without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Materials, and to
-permit persons to whom the Materials are furnished to do so, subject to
-the following conditions:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Materials.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 ------------------------------------------------------------------------
 
@@ -29,8 +22,9 @@ and normative part of the Vulkan Specification, including a canonical
 machine-readable definition of the API, parameter and member validation
 language incorporated into the Specification and reference pages, and other
 material which is registered by Khronos, such as tags used by extension and
-layer authors. The only authoritative version of vk.xml is the one
-maintained in the master branch of the Khronos Vulkan GitHub project.
+layer authors. The authoritative public version of vk.xml is maintained in
+the master branch of the Khronos Vulkan GitHub project. The authoritative
+private version is maintained in the 1.0 branch of the member gitlab server.
     </comment>
 
     <!-- SECTION: Vulkan vendor IDs for physical devices without PCI vendor IDs -->
@@ -112,7 +106,7 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
         <type category="define">// Vulkan 1.0 version number
 #define <name>VK_API_VERSION_1_0</name> <type>VK_MAKE_VERSION</type>(1, 0, 0)</type>    <!-- The patch version here should never be set to anything other than 0 -->
         <type category="define">// Version of this file
-#define <name>VK_HEADER_VERSION</name> 51</type>
+#define <name>VK_HEADER_VERSION</name> 52</type>
 
         <type category="define">
 #define <name>VK_DEFINE_HANDLE</name>(object) typedef struct object##_T* object;</type>
@@ -240,6 +234,11 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
         <type requires="VkSurfaceCounterFlagBitsEXT"      category="bitmask">typedef <type>VkFlags</type> <name>VkSurfaceCounterFlagsEXT</name>;</type>
         <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkPipelineViewportSwizzleStateCreateFlagsNV</name>;</type>     <!-- creation flags (no bits yet) -->
         <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkPipelineDiscardRectangleStateCreateFlagsEXT</name>;</type>     <!-- creation flags (no bits yet) -->
+        <type                                             category="bitmask">typedef <type>VkFlags</type> <name>VkPipelineCoverageToColorStateCreateFlagsNV</name>;</type>     <!-- creation flags (no bits yet) -->
+        <type requires="VkDebugUtilsMessageSeverityFlagBitsEXT"  category="bitmask">typedef <type>VkFlags</type> <name>VkDebugUtilsMessageSeverityFlagsEXT</name>;</type>
+        <type requires="VkDebugUtilsMessageTypeFlagBitsEXT"      category="bitmask">typedef <type>VkFlags</type> <name>VkDebugUtilsMessageTypeFlagsEXT</name>;</type>
+        <type                                               category="bitmask">typedef <type>VkFlags</type> <name>VkDebugUtilsMessengerCreateFlagsEXT</name>;</type>
+        <type                                               category="bitmask">typedef <type>VkFlags</type> <name>VkDebugUtilsMessengerCallbackDataFlagsEXT</name>;</type>
 
         <!-- Types which can be void pointers or class pointers, selected at compile time -->
         <type category="handle"><type>VK_DEFINE_HANDLE</type>(<name>VkInstance</name>)</type>
@@ -277,6 +276,7 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
         <type category="handle" parent="VkInstance"><type>VK_DEFINE_NON_DISPATCHABLE_HANDLE</type>(<name>VkSurfaceKHR</name>)</type>
         <type category="handle" parent="VkSurfaceKHR"><type>VK_DEFINE_NON_DISPATCHABLE_HANDLE</type>(<name>VkSwapchainKHR</name>)</type>
         <type category="handle" parent="VkInstance"><type>VK_DEFINE_NON_DISPATCHABLE_HANDLE</type>(<name>VkDebugReportCallbackEXT</name>)</type>
+        <type category="handle" parent="VkInstance"><type>VK_DEFINE_NON_DISPATCHABLE_HANDLE</type>(<name>VkDebugUtilsMessengerEXT</name>)</type>
 
         <!-- Types generated from corresponding <enums> tags below -->
         <type name="VkAttachmentLoadOp" category="enum"/>
@@ -399,6 +399,8 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
         <type name="VkMemoryAllocateFlagBitsKHX" category="enum"/>
         <type name="VkDeviceGroupPresentModeFlagBitsKHX" category="enum"/>
         <type name="VkSwapchainCreateFlagBitsKHR" category="enum"/>
+        <type name="VkDebugUtilsMessageSeverityFlagBitsEXT" category="enum"/>
+        <type name="VkDebugUtilsMessageTypeFlagBitsEXT" category="enum"/>
 
         <!-- The PFN_vk*Function types are used by VkAllocationCallbacks below -->
         <type category="funcpointer">typedef void (VKAPI_PTR *<name>PFN_vkInternalAllocationNotification</name>)(
@@ -438,6 +440,13 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
     <type>int32_t</type>                                     messageCode,
     const <type>char</type>*                                 pLayerPrefix,
     const <type>char</type>*                                 pMessage,
+    <type>void</type>*                                       pUserData);</type>
+
+    <!-- The PFN_vkDebugUtilsMessengerCallbackEXT type are used by the VK_EXT_debug_utils extension-->
+        <type category="funcpointer">typedef VkBool32 (VKAPI_PTR *<name>PFN_vkDebugUtilsMessengerCallbackEXT</name>)(
+    <type>VkDebugUtilsMessageSeverityFlagBitsEXT</type>           messageSeverity,
+    <type>VkDebugUtilsMessageTypeFlagsEXT</type>                  messageType,
+    const <type>VkDebugUtilsMessengerCallbackDataEXT</type>*      pCallbackData,
     <type>void</type>*                                       pUserData);</type>
 
         <!-- Struct types -->
@@ -546,7 +555,7 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
         </type>
         <type category="struct" name="VkInstanceCreateInfo">
             <member values="VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO"><type>VkStructureType</type> <name>sType</name></member>
-            <member validextensionstructs="VkDebugReportCallbackCreateInfoEXT">const <type>void</type>*     <name>pNext</name></member>                          <!-- Pointer to next structure -->
+            <member validextensionstructs="VkDebugReportCallbackCreateInfoEXT,VkDebugUtilsMessengerCreateInfoEXT">const <type>void</type>*     <name>pNext</name></member>                          <!-- Pointer to next structure -->
             <member optional="true"><type>VkInstanceCreateFlags</type>  <name>flags</name></member>                          <!-- Reserved -->
             <member optional="true">const <type>VkApplicationInfo</type>* <name>pApplicationInfo</name></member>
             <member optional="true"><type>uint32_t</type>               <name>enabledLayerCount</name></member>
@@ -954,7 +963,7 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
         </type>
         <type category="struct" name="VkPipelineMultisampleStateCreateInfo">
             <member values="VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO"><type>VkStructureType</type> <name>sType</name></member>
-            <member>const <type>void</type>*            <name>pNext</name></member>                          <!-- Pointer to next structure -->
+            <member validextensionstructs="VkPipelineCoverageToColorStateCreateInfoNV">const <type>void</type>*            <name>pNext</name></member>                          <!-- Pointer to next structure -->
             <member optional="true"><type>VkPipelineMultisampleStateCreateFlags</type>    <name>flags</name></member>        <!-- Reserved -->
             <member><type>VkSampleCountFlagBits</type>  <name>rasterizationSamples</name></member>           <!-- Number of samples used for rasterization -->
             <member><type>VkBool32</type>               <name>sampleShadingEnable</name></member>            <!-- optional (GL45) -->
@@ -2279,6 +2288,58 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
             <member><type>void</type>*                            <name>pNext</name></member>                    <!-- Pointer to next structure -->
             <member><type>VkBool32</type>                         <name>supportsTextureGatherLODBiasAMD</name></member>
         </type>
+        <type category="struct" name="VkPipelineCoverageToColorStateCreateInfoNV">
+            <member values="VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_TO_COLOR_STATE_CREATE_INFO_NV"><type>VkStructureType</type> <name>sType</name></member>
+            <member>const <type>void</type>*                                                                      <name>pNext</name></member>                 <!-- Pointer to next structure -->
+            <member optional="true"><type>VkPipelineCoverageToColorStateCreateFlagsNV</type>                    <name>flags</name></member>                 <!-- Reserved -->
+            <member><type>VkBool32</type>                         <name>coverageToColorEnable</name></member>
+            <member optional="true"><type>uint32_t</type>         <name>coverageToColorLocation</name></member>
+        </type>
+        <type category="struct" name="VkDebugUtilsObjectNameInfoEXT">
+            <member values="VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT"><type>VkStructureType</type> <name>sType</name></member>
+            <member>const <type>void</type>*                            <name>pNext</name></member>             <!-- Pointer to next structure -->
+            <member><type>VkObjectType</type>                           <name>objectType</name></member>        <!-- The type of the object -->
+            <member><type>uint64_t</type>                               <name>objectHandle</name></member>      <!-- The handle of the object, cast to uint64_t -->
+            <member optional="true" len="null-terminated">const <type>char</type>*      <name>pObjectName</name></member>       <!-- Name to apply to the object -->
+        </type>
+        <type category="struct" name="VkDebugUtilsObjectTagInfoEXT">
+            <member values="VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT"><type>VkStructureType</type> <name>sType</name></member>
+            <member>const <type>void</type>*                            <name>pNext</name></member>             <!-- Pointer to next structure -->
+            <member><type>VkObjectType</type>                           <name>objectType</name></member>        <!-- The type of the object -->
+            <member><type>uint64_t</type>                               <name>objectHandle</name></member>      <!-- The handle of the object, cast to uint64_t -->
+            <member><type>uint64_t</type>                               <name>tagName</name></member>           <!-- The name of the tag to set on the object -->
+            <member><type>size_t</type>                                 <name>tagSize</name></member>           <!-- The length in bytes of the tag data -->
+            <member len="tagSize">const <type>void</type>*              <name>pTag</name></member>              <!-- Tag data to attach to the object -->
+        </type>
+        <type category="struct" name="VkDebugUtilsLabelEXT">
+            <member values="VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT"><type>VkStructureType</type> <name>sType</name></member>
+            <member>const <type>void</type>*                            <name>pNext</name></member>             <!-- Pointer to next structure -->
+            <member len="null-terminated">const <type>char</type>*      <name>pLabelName</name></member>        <!-- Name of the debug label -->
+            <member optional="true"><type>float</type>                  <name>color</name>[4]</member>          <!-- Optional color for debug label -->
+        </type>
+        <type category="struct" name="VkDebugUtilsMessengerCreateInfoEXT">
+            <member values="VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT"><type>VkStructureType</type> <name>sType</name></member>
+            <member>const <type>void</type>*                            <name>pNext</name></member>             <!-- Pointer to next structure -->
+            <member optional="true"><type>VkDebugUtilsMessengerCreateFlagsEXT</type>  <name>flags</name></member>     <!-- Reserved -->
+            <member><type>VkDebugUtilsMessageSeverityFlagsEXT</type>    <name>messageSeverity</name></member>   <!-- What severity of messages this callback is interested in -->
+            <member><type>VkDebugUtilsMessageTypeFlagsEXT</type>        <name>messageType</name></member>       <!-- What type of messages this callback is interested in -->
+            <member><type>PFN_vkDebugUtilsMessengerCallbackEXT</type>   <name>pfnUserCallback</name></member>   <!-- Function pointer of a callback function-->
+            <member optional="true"><type>void</type>*                  <name>pUserData</name></member>         <!-- User data provided to callback function -->
+        </type>
+        <type category="struct" name="VkDebugUtilsMessengerCallbackDataEXT">
+            <member values="VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT"><type>VkStructureType</type> <name>sType</name></member>
+            <member>const <type>void</type>*                            <name>pNext</name></member>             <!-- Pointer to next structure -->
+            <member optional="true"><type>VkDebugUtilsMessengerCallbackDataFlagsEXT</type>  <name>flags</name></member>     <!-- Reserved -->
+            <member len="null-terminated">const <type>char</type>*      <name>pMessageSource</name></member>    <!-- Source of message -->
+            <member><type>int32_t</type>                                <name>messageNumber</name></member>     <!-- ID number of message -->
+            <member len="null-terminated">const <type>char</type>*      <name>pMessage</name></member>          <!-- Message string -->
+            <member optional="true"><type>uint8_t</type>                <name>queueLabelCount</name></member> <!-- Number of queue labels -->
+            <member noautovalidity="true" optional="true" len="queueLabelCount">const <type>VkDebugUtilsLabelEXT</type>*  <name>pQueueLabels</name></member> <!-- Queue labels -->
+            <member optional="true"><type>uint8_t</type>                <name>cmdBufLabelCount</name></member> <!-- Number of command buffer labels -->
+            <member noautovalidity="true" optional="true" len="cmdBufLabelCount">const <type>VkDebugUtilsLabelEXT</type>*  <name>pCmdBufLabels</name></member> <!-- Command buffer labels -->
+            <member><type>uint8_t</type>                <name>objectCount</name></member>       <!-- Number of reporting objects related to this message -->
+            <member noautovalidity="true" len="objectCount">const <type>VkDebugUtilsObjectNameInfoEXT</type>*  <name>pObjects</name></member>  <!-- Objects -->
+        </type>
     </types>
 
     <!-- SECTION: Vulkan enumerant (token) definitions. -->
@@ -3239,6 +3300,17 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
         <enum value="1"     name="VK_DISCARD_RECTANGLE_MODE_EXCLUSIVE_EXT"/>
     </enums>
     <enums name="VkSubpassDescriptionFlagBits" type="bitmask">
+    </enums>
+    <enums name="VkDebugUtilsMessageSeverityFlagBitsEXT" type="bitmask">
+        <enum bitpos="0"     name="VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT"/>
+        <enum bitpos="4"     name="VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT"/>
+        <enum bitpos="8"     name="VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT"/>
+        <enum bitpos="12"    name="VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT"/>
+    </enums>
+    <enums name="VkDebugUtilsMessageTypeFlagBitsEXT" type="bitmask">
+        <enum bitpos="0"     name="VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT"/>
+        <enum bitpos="1"     name="VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT"/>
+        <enum bitpos="2"     name="VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT"/>
     </enums>
 
 
@@ -4867,6 +4939,64 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
             <param optional="false,true"><type>uint32_t</type>* <name>pSurfaceFormatCount</name></param>
             <param optional="true" len="pSurfaceFormatCount"><type>VkSurfaceFormat2KHR</type>* <name>pSurfaceFormats</name></param>
         </command>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_ERROR_OUT_OF_DEVICE_MEMORY">
+            <proto><type>VkResult</type> <name>vkSetDebugUtilsObjectNameEXT</name></proto>
+            <param><type>VkDevice</type> <name>device</name></param>
+            <param externsync="pNameInfo.objectHandle">const <type>VkDebugUtilsObjectNameInfoEXT</type>* <name>pNameInfo</name></param>
+        </command>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY,VK_ERROR_OUT_OF_DEVICE_MEMORY">
+            <proto><type>VkResult</type> <name>vkSetDebugUtilsObjectTagEXT</name></proto>
+            <param><type>VkDevice</type> <name>device</name></param>
+            <param externsync="pTagInfo.objectHandle">const <type>VkDebugUtilsObjectTagInfoEXT</type>* <name>pTagInfo</name></param>
+        </command>
+        <command>
+            <proto><type>void</type> <name>vkQueueBeginDebugUtilsLabelEXT</name></proto>
+            <param><type>VkQueue</type> <name>queue</name></param>
+            <param>const <type>VkDebugUtilsLabelEXT</type>* <name>pLabelInfo</name></param>
+        </command>
+        <command>
+            <proto><type>void</type> <name>vkQueueEndDebugUtilsLabelEXT</name></proto>
+            <param><type>VkQueue</type> <name>queue</name></param>
+        </command>
+        <command>
+            <proto><type>void</type> <name>vkQueueInsertDebugUtilsLabelEXT</name></proto>
+            <param><type>VkQueue</type> <name>queue</name></param>
+            <param>const <type>VkDebugUtilsLabelEXT</type>* <name>pLabelInfo</name></param>
+        </command>
+        <command queues="graphics,compute" renderpass="both" cmdbufferlevel="primary,secondary">
+            <proto><type>void</type> <name>vkCmdBeginDebugUtilsLabelEXT</name></proto>
+            <param><type>VkCommandBuffer</type> <name>commandBuffer</name></param>
+            <param>const <type>VkDebugUtilsLabelEXT</type>* <name>pLabelInfo</name></param>
+        </command>
+        <command queues="graphics,compute" renderpass="both" cmdbufferlevel="primary,secondary">
+            <proto><type>void</type> <name>vkCmdEndDebugUtilsLabelEXT</name></proto>
+            <param><type>VkCommandBuffer</type> <name>commandBuffer</name></param>
+        </command>
+        <command queues="graphics,compute" renderpass="both" cmdbufferlevel="primary,secondary">
+            <proto><type>void</type> <name>vkCmdInsertDebugUtilsLabelEXT</name></proto>
+            <param><type>VkCommandBuffer</type> <name>commandBuffer</name></param>
+            <param>const <type>VkDebugUtilsLabelEXT</type>* <name>pLabelInfo</name></param>
+        </command>
+        <command successcodes="VK_SUCCESS" errorcodes="VK_ERROR_OUT_OF_HOST_MEMORY">
+            <proto><type>VkResult</type> <name>vkCreateDebugUtilsMessengerEXT</name></proto>
+            <param><type>VkInstance</type> <name>instance</name></param>
+            <param>const <type>VkDebugUtilsMessengerCreateInfoEXT</type>* <name>pCreateInfo</name></param>
+            <param optional="true">const <type>VkAllocationCallbacks</type>* <name>pAllocator</name></param>
+            <param><type>VkDebugUtilsMessengerEXT</type>* <name>pMessenger</name></param>
+        </command>
+        <command>
+            <proto><type>void</type> <name>vkDestroyDebugUtilsMessengerEXT</name></proto>
+            <param><type>VkInstance</type> <name>instance</name></param>
+            <param externsync="true"><type>VkDebugUtilsMessengerEXT</type> <name>messenger</name></param>
+            <param optional="true">const <type>VkAllocationCallbacks</type>* <name>pAllocator</name></param>
+        </command>
+        <command>
+            <proto><type>void</type> <name>vkSubmitDebugUtilsMessageEXT</name></proto>
+            <param><type>VkInstance</type> <name>instance</name></param>
+            <param><type>VkDebugUtilsMessageSeverityFlagBitsEXT</type> <name>messageSeverity</name></param>
+            <param><type>VkDebugUtilsMessageTypeFlagsEXT</type> <name>messageTypes</name></param>
+            <param>const <type>VkDebugUtilsMessengerCallbackDataEXT</type>* <name>pCallbackData</name></param>
+        </command>
     </commands>
 
     <!-- SECTION: Vulkan API interface definitions -->
@@ -5633,7 +5763,7 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
                 <command name="vkGetPhysicalDeviceSparseImageFormatProperties2KHR"/>
             </require>
         </extension>
-        <extension name="VK_KHX_device_group" number="61" type="device" author="KHX" requires="VK_KHR_swapchain" contact="Jeff Bolz @jbolz" supported="vulkan">
+        <extension name="VK_KHX_device_group" number="61" type="device" author="KHX" requires="VK_KHR_swapchain,VK_KHX_device_group_creation" contact="Jeff Bolz @jbolz" supported="vulkan">
             <require>
                 <enum value="1"                                         name="VK_KHX_DEVICE_GROUP_SPEC_VERSION"/>
                 <enum value="&quot;VK_KHX_device_group&quot;"           name="VK_KHX_DEVICE_GROUP_EXTENSION_NAME"/>
@@ -6324,10 +6454,32 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
                 <enum value="&quot;VK_KHR_extension_128&quot;"          name="VK_KHR_EXTENSION_128_EXTENSION_NAME"/>
             </require>
         </extension>
-        <extension name="VK_EXT_extension_129" number="129" author="LUNARG" contact="Mark Young @MarkY_LunarG" supported="disabled">
+        <extension name="VK_EXT_debug_utils" number="129" type="instance" author="EXT" contact="Mark Young @MarkY_LunarG" supported="vulkan">
             <require>
-                <enum value="0"                                         name="VK_KHR_EXTENSION_129_SPEC_VERSION"/>
-                <enum value="&quot;VK_EXT_extension_129&quot;"          name="VK_KHR_EXTENSION_129_EXTENSION_NAME"/>
+                <enum value="1"                                         name="VK_EXT_DEBUG_UTILS_SPEC_VERSION"/>
+                <enum value="&quot;VK_EXT_debug_utils&quot;"            name="VK_EXT_DEBUG_UTILS_EXTENSION_NAME"/>
+                <enum offset="0" extends="VkStructureType"              name="VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT"/>
+                <enum offset="1" extends="VkStructureType"              name="VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT"/>
+                <enum offset="2" extends="VkStructureType"              name="VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT"/>
+                <enum offset="3" extends="VkStructureType"              name="VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT"/>
+                <enum offset="4" extends="VkStructureType"              name="VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT"/>
+                <enum offset="0" extends="VkObjectType"                 name="VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT"          comment="VkDebugUtilsMessengerEXT"/>
+                <type name="VkDebugUtilsObjectNameInfoEXT"/>
+                <type name="VkDebugUtilsObjectTagInfoEXT"/>
+                <type name="VkDebugUtilsLabelEXT"/>
+                <type name="VkDebugUtilsMessengerCallbackDataEXT"/>
+                <type name="VkDebugUtilsMessengerCreateInfoEXT"/>
+                <command name="vkSetDebugUtilsObjectNameEXT"/>
+                <command name="vkSetDebugUtilsObjectTagEXT"/>
+                <command name="vkQueueBeginDebugUtilsLabelEXT"/>
+                <command name="vkQueueEndDebugUtilsLabelEXT"/>
+                <command name="vkQueueInsertDebugUtilsLabelEXT"/>
+                <command name="vkCmdBeginDebugUtilsLabelEXT"/>
+                <command name="vkCmdEndDebugUtilsLabelEXT"/>
+                <command name="vkCmdInsertDebugUtilsLabelEXT"/>
+                <command name="vkCreateDebugUtilsMessengerEXT"/>
+                <command name="vkDestroyDebugUtilsMessengerEXT"/>
+                <command name="vkSubmitDebugUtilsMessageEXT"/>
             </require>
         </extension>
         <extension name="VK_KHR_extension_130" number="130" author="KHR" contact="Jesse Hall @jessehall" supported="disabled">
@@ -6450,10 +6602,13 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
                 <enum value="&quot;VK_NV_extension_149&quot;"            name="VK_NV_EXTENSION_149_EXTENSION_NAME"/>
             </require>
         </extension>
-        <extension name="VK_NV_extension_150" number="150" author="NV" contact="Jeff Bolz @jbolz" supported="disabled">
+        <extension name="VK_NV_fragment_coverage_to_color" number="150" type="device" author="NV" contact="Jeff Bolz @jbolz" supported="vulkan">
             <require>
-                <enum value="0"                                          name="VK_NV_EXTENSION_150_SPEC_VERSION"/>
-                <enum value="&quot;VK_NV_extension_150&quot;"            name="VK_NV_EXTENSION_150_EXTENSION_NAME"/>
+                <enum value="1"                                          name="VK_NV_FRAGMENT_COVERAGE_TO_COLOR_SPEC_VERSION"/>
+                <enum value="&quot;VK_NV_fragment_coverage_to_color&quot;" name="VK_NV_FRAGMENT_COVERAGE_TO_COLOR_EXTENSION_NAME"/>
+                <enum offset="0" extends="VkStructureType"               name="VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_TO_COLOR_STATE_CREATE_INFO_NV"/>
+                <type name="VkPipelineCoverageToColorStateCreateFlagsNV"/>
+                <type name="VkPipelineCoverageToColorStateCreateInfoNV"/>
             </require>
         </extension>
         <extension name="VK_NV_extension_151" number="151" author="NV" contact="Jeff Bolz @jbolz" supported="disabled">
@@ -6474,10 +6629,11 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
                 <enum value="&quot;VK_NV_extension_153&quot;"            name="VK_NV_EXTENSION_153_EXTENSION_NAME"/>
             </require>
         </extension>
-        <extension name="VK_NV_extension_154" number="154" author="NV" contact="Jeff Bolz @jbolz" supported="disabled">
+        <extension name="VK_NV_fill_rectangle" number="154" type="device" author="NV" contact="Jeff Bolz @jbolz" supported="vulkan">
             <require>
-                <enum value="0"                                          name="VK_NV_EXTENSION_154_SPEC_VERSION"/>
-                <enum value="&quot;VK_NV_extension_154&quot;"            name="VK_NV_EXTENSION_154_EXTENSION_NAME"/>
+                <enum value="1"                                          name="VK_NV_FILL_RECTANGLE_SPEC_VERSION"/>
+                <enum value="&quot;VK_NV_fill_rectangle&quot;"           name="VK_NV_FILL_RECTANGLE_EXTENSION_NAME"/>
+                <enum offset="0" extends="VkPolygonMode"                 name="VK_POLYGON_MODE_FILL_RECTANGLE_NV"/>
             </require>
         </extension>
         <extension name="VK_NV_extension_155" number="155" author="NV" contact="Jeff Bolz @jbolz" supported="disabled">
@@ -6508,6 +6664,12 @@ maintained in the master branch of the Khronos Vulkan GitHub project.
             <require>
                 <enum value="0"                                          name="VK_EXT_EXTENSION_159_SPEC_VERSION"/>
                 <enum value="&quot;VK_EXT_extension_159&quot;"           name="VK_EXT_EXTENSION_159_EXTENSION_NAME"/>
+            </require>
+        </extension>
+        <extension name="VK_EXT_extension_160" number="160" author="EXT" contact="Mark Young @MarkY_LunarG" supported="disabled">
+            <require>
+                <enum value="0"                                          name="VK_EXT_EXTENSION_160_SPEC_VERSION"/>
+                <enum value="&quot;VK_EXT_extension_160&quot;"           name="VK_EXT_EXTENSION_160_EXTENSION_NAME"/>
             </require>
         </extension>
     </extensions>

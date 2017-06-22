@@ -1,23 +1,16 @@
 // Copyright (c) 2015-2017 The Khronos Group Inc.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and/or associated documentation files (the
-// "Materials"), to deal in the Materials without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Materials, and to
-// permit persons to whom the Materials are furnished to do so, subject to
-// the following conditions:
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 // 
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Materials.
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
-// THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-// MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 // This header is generated from the Khronos Vulkan XML API Registry.
 
@@ -40,7 +33,7 @@
 # include <memory>
 # include <vector>
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
-static_assert( VK_HEADER_VERSION ==  51 , "Wrong VK_HEADER_VERSION!" );
+static_assert( VK_HEADER_VERSION ==  52 , "Wrong VK_HEADER_VERSION!" );
 
 // 32-bit vulkan is not typesafe for handles, so don't allow copy constructors on this platform by default.
 // To enable this feature on 32-bit platforms please define VULKAN_HPP_TYPESAFE_CONVERSION
@@ -1156,6 +1149,24 @@ namespace vk
   };
 
   using PipelineDiscardRectangleStateCreateFlagsEXT = Flags<PipelineDiscardRectangleStateCreateFlagBitsEXT, VkPipelineDiscardRectangleStateCreateFlagsEXT>;
+
+  enum class PipelineCoverageToColorStateCreateFlagBitsNV
+  {
+  };
+
+  using PipelineCoverageToColorStateCreateFlagsNV = Flags<PipelineCoverageToColorStateCreateFlagBitsNV, VkPipelineCoverageToColorStateCreateFlagsNV>;
+
+  enum class DebugUtilsMessengerCreateFlagBitsEXT
+  {
+  };
+
+  using DebugUtilsMessengerCreateFlagsEXT = Flags<DebugUtilsMessengerCreateFlagBitsEXT, VkDebugUtilsMessengerCreateFlagsEXT>;
+
+  enum class DebugUtilsMessengerCallbackDataFlagBitsEXT
+  {
+  };
+
+  using DebugUtilsMessengerCallbackDataFlagsEXT = Flags<DebugUtilsMessengerCallbackDataFlagBitsEXT, VkDebugUtilsMessengerCallbackDataFlagsEXT>;
 
   class DeviceMemory
   {
@@ -3032,6 +3043,73 @@ namespace vk
   };
 
   static_assert( sizeof( DebugReportCallbackEXT ) == sizeof( VkDebugReportCallbackEXT ), "handle and wrapper have different size!" );
+
+  class DebugUtilsMessengerEXT
+  {
+  public:
+    DebugUtilsMessengerEXT()
+      : m_debugUtilsMessengerEXT(VK_NULL_HANDLE)
+    {}
+
+    DebugUtilsMessengerEXT( std::nullptr_t )
+      : m_debugUtilsMessengerEXT(VK_NULL_HANDLE)
+    {}
+
+    VULKAN_HPP_TYPESAFE_EXPLICIT DebugUtilsMessengerEXT( VkDebugUtilsMessengerEXT debugUtilsMessengerEXT )
+       : m_debugUtilsMessengerEXT( debugUtilsMessengerEXT )
+    {}
+
+#if defined(VULKAN_HPP_TYPESAFE_CONVERSION)
+    DebugUtilsMessengerEXT & operator=(VkDebugUtilsMessengerEXT debugUtilsMessengerEXT)
+    {
+      m_debugUtilsMessengerEXT = debugUtilsMessengerEXT;
+      return *this; 
+    }
+#endif
+
+    DebugUtilsMessengerEXT & operator=( std::nullptr_t )
+    {
+      m_debugUtilsMessengerEXT = VK_NULL_HANDLE;
+      return *this;
+    }
+
+    bool operator==( DebugUtilsMessengerEXT const & rhs ) const
+    {
+      return m_debugUtilsMessengerEXT == rhs.m_debugUtilsMessengerEXT;
+    }
+
+    bool operator!=(DebugUtilsMessengerEXT const & rhs ) const
+    {
+      return m_debugUtilsMessengerEXT != rhs.m_debugUtilsMessengerEXT;
+    }
+
+    bool operator<(DebugUtilsMessengerEXT const & rhs ) const
+    {
+      return m_debugUtilsMessengerEXT < rhs.m_debugUtilsMessengerEXT;
+    }
+
+
+
+    VULKAN_HPP_TYPESAFE_EXPLICIT operator VkDebugUtilsMessengerEXT() const
+    {
+      return m_debugUtilsMessengerEXT;
+    }
+
+    explicit operator bool() const
+    {
+      return m_debugUtilsMessengerEXT != VK_NULL_HANDLE;
+    }
+
+    bool operator!() const
+    {
+      return m_debugUtilsMessengerEXT == VK_NULL_HANDLE;
+    }
+
+  private:
+    VkDebugUtilsMessengerEXT m_debugUtilsMessengerEXT;
+  };
+
+  static_assert( sizeof( DebugUtilsMessengerEXT ) == sizeof( VkDebugUtilsMessengerEXT ), "handle and wrapper have different size!" );
 
   struct Offset2D
   {
@@ -5767,7 +5845,8 @@ namespace vk
   {
     eFill = VK_POLYGON_MODE_FILL,
     eLine = VK_POLYGON_MODE_LINE,
-    ePoint = VK_POLYGON_MODE_POINT
+    ePoint = VK_POLYGON_MODE_POINT,
+    eFillRectangleNV = VK_POLYGON_MODE_FILL_RECTANGLE_NV
   };
 
   enum class CullModeFlagBits
@@ -6471,7 +6550,13 @@ namespace vk
     eSurfaceCapabilities2KHR = VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR,
     eSurfaceFormat2KHR = VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR,
     eIosSurfaceCreateInfoMVK = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK,
-    eMacosSurfaceCreateInfoMVK = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK
+    eMacosSurfaceCreateInfoMVK = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK,
+    eDebugUtilsObjectNameInfoEXT = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+    eDebugUtilsObjectTagInfoEXT = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_TAG_INFO_EXT,
+    eDebugUtilsLabelEXT = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
+    eDebugUtilsMessengerCallbackDataEXT = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CALLBACK_DATA_EXT,
+    eDebugUtilsMessengerCreateInfoEXT = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+    ePipelineCoverageToColorStateCreateInfoNV = VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_TO_COLOR_STATE_CREATE_INFO_NV
   };
 
   struct ApplicationInfo
@@ -12193,6 +12278,147 @@ namespace vk
   };
   static_assert( sizeof( TextureLODGatherFormatPropertiesAMD ) == sizeof( VkTextureLODGatherFormatPropertiesAMD ), "struct and wrapper have different size!" );
 
+  struct PipelineCoverageToColorStateCreateInfoNV
+  {
+    PipelineCoverageToColorStateCreateInfoNV( PipelineCoverageToColorStateCreateFlagsNV flags_ = PipelineCoverageToColorStateCreateFlagsNV(), Bool32 coverageToColorEnable_ = 0, uint32_t coverageToColorLocation_ = 0 )
+      : sType( StructureType::ePipelineCoverageToColorStateCreateInfoNV )
+      , pNext( nullptr )
+      , flags( flags_ )
+      , coverageToColorEnable( coverageToColorEnable_ )
+      , coverageToColorLocation( coverageToColorLocation_ )
+    {
+    }
+
+    PipelineCoverageToColorStateCreateInfoNV( VkPipelineCoverageToColorStateCreateInfoNV const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( PipelineCoverageToColorStateCreateInfoNV ) );
+    }
+
+    PipelineCoverageToColorStateCreateInfoNV& operator=( VkPipelineCoverageToColorStateCreateInfoNV const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( PipelineCoverageToColorStateCreateInfoNV ) );
+      return *this;
+    }
+    PipelineCoverageToColorStateCreateInfoNV& setPNext( const void* pNext_ )
+    {
+      pNext = pNext_;
+      return *this;
+    }
+
+    PipelineCoverageToColorStateCreateInfoNV& setFlags( PipelineCoverageToColorStateCreateFlagsNV flags_ )
+    {
+      flags = flags_;
+      return *this;
+    }
+
+    PipelineCoverageToColorStateCreateInfoNV& setCoverageToColorEnable( Bool32 coverageToColorEnable_ )
+    {
+      coverageToColorEnable = coverageToColorEnable_;
+      return *this;
+    }
+
+    PipelineCoverageToColorStateCreateInfoNV& setCoverageToColorLocation( uint32_t coverageToColorLocation_ )
+    {
+      coverageToColorLocation = coverageToColorLocation_;
+      return *this;
+    }
+
+    operator const VkPipelineCoverageToColorStateCreateInfoNV&() const
+    {
+      return *reinterpret_cast<const VkPipelineCoverageToColorStateCreateInfoNV*>(this);
+    }
+
+    bool operator==( PipelineCoverageToColorStateCreateInfoNV const& rhs ) const
+    {
+      return ( sType == rhs.sType )
+          && ( pNext == rhs.pNext )
+          && ( flags == rhs.flags )
+          && ( coverageToColorEnable == rhs.coverageToColorEnable )
+          && ( coverageToColorLocation == rhs.coverageToColorLocation );
+    }
+
+    bool operator!=( PipelineCoverageToColorStateCreateInfoNV const& rhs ) const
+    {
+      return !operator==( rhs );
+    }
+
+  private:
+    StructureType sType;
+
+  public:
+    const void* pNext;
+    PipelineCoverageToColorStateCreateFlagsNV flags;
+    Bool32 coverageToColorEnable;
+    uint32_t coverageToColorLocation;
+  };
+  static_assert( sizeof( PipelineCoverageToColorStateCreateInfoNV ) == sizeof( VkPipelineCoverageToColorStateCreateInfoNV ), "struct and wrapper have different size!" );
+
+  struct DebugUtilsLabelEXT
+  {
+    DebugUtilsLabelEXT( const char* pLabelName_ = nullptr, std::array<float,4> const& color_ = { { 0, 0, 0, 0 } } )
+      : sType( StructureType::eDebugUtilsLabelEXT )
+      , pNext( nullptr )
+      , pLabelName( pLabelName_ )
+    {
+      memcpy( &color, color_.data(), 4 * sizeof( float ) );
+    }
+
+    DebugUtilsLabelEXT( VkDebugUtilsLabelEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsLabelEXT ) );
+    }
+
+    DebugUtilsLabelEXT& operator=( VkDebugUtilsLabelEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsLabelEXT ) );
+      return *this;
+    }
+    DebugUtilsLabelEXT& setPNext( const void* pNext_ )
+    {
+      pNext = pNext_;
+      return *this;
+    }
+
+    DebugUtilsLabelEXT& setPLabelName( const char* pLabelName_ )
+    {
+      pLabelName = pLabelName_;
+      return *this;
+    }
+
+    DebugUtilsLabelEXT& setColor( std::array<float,4> color_ )
+    {
+      memcpy( &color, color_.data(), 4 * sizeof( float ) );
+      return *this;
+    }
+
+    operator const VkDebugUtilsLabelEXT&() const
+    {
+      return *reinterpret_cast<const VkDebugUtilsLabelEXT*>(this);
+    }
+
+    bool operator==( DebugUtilsLabelEXT const& rhs ) const
+    {
+      return ( sType == rhs.sType )
+          && ( pNext == rhs.pNext )
+          && ( pLabelName == rhs.pLabelName )
+          && ( memcmp( color, rhs.color, 4 * sizeof( float ) ) == 0 );
+    }
+
+    bool operator!=( DebugUtilsLabelEXT const& rhs ) const
+    {
+      return !operator==( rhs );
+    }
+
+  private:
+    StructureType sType;
+
+  public:
+    const void* pNext;
+    const char* pLabelName;
+    float color[4];
+  };
+  static_assert( sizeof( DebugUtilsLabelEXT ) == sizeof( VkDebugUtilsLabelEXT ), "struct and wrapper have different size!" );
+
   enum class SubpassContents
   {
     eInline = VK_SUBPASS_CONTENTS_INLINE,
@@ -12552,8 +12778,315 @@ namespace vk
     eDebugReportCallbackEXT = VK_OBJECT_TYPE_DEBUG_REPORT_CALLBACK_EXT,
     eDescriptorUpdateTemplateKHR = VK_OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_KHR,
     eObjectTableNVX = VK_OBJECT_TYPE_OBJECT_TABLE_NVX,
-    eIndirectCommandsLayoutNVX = VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX
+    eIndirectCommandsLayoutNVX = VK_OBJECT_TYPE_INDIRECT_COMMANDS_LAYOUT_NVX,
+    eDebugUtilsMessengerEXT = VK_OBJECT_TYPE_DEBUG_UTILS_MESSENGER_EXT
   };
+
+  struct DebugUtilsObjectNameInfoEXT
+  {
+    DebugUtilsObjectNameInfoEXT( ObjectType objectType_ = ObjectType::eUnknown, uint64_t objectHandle_ = 0, const char* pObjectName_ = nullptr )
+      : sType( StructureType::eDebugUtilsObjectNameInfoEXT )
+      , pNext( nullptr )
+      , objectType( objectType_ )
+      , objectHandle( objectHandle_ )
+      , pObjectName( pObjectName_ )
+    {
+    }
+
+    DebugUtilsObjectNameInfoEXT( VkDebugUtilsObjectNameInfoEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsObjectNameInfoEXT ) );
+    }
+
+    DebugUtilsObjectNameInfoEXT& operator=( VkDebugUtilsObjectNameInfoEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsObjectNameInfoEXT ) );
+      return *this;
+    }
+    DebugUtilsObjectNameInfoEXT& setPNext( const void* pNext_ )
+    {
+      pNext = pNext_;
+      return *this;
+    }
+
+    DebugUtilsObjectNameInfoEXT& setObjectType( ObjectType objectType_ )
+    {
+      objectType = objectType_;
+      return *this;
+    }
+
+    DebugUtilsObjectNameInfoEXT& setObjectHandle( uint64_t objectHandle_ )
+    {
+      objectHandle = objectHandle_;
+      return *this;
+    }
+
+    DebugUtilsObjectNameInfoEXT& setPObjectName( const char* pObjectName_ )
+    {
+      pObjectName = pObjectName_;
+      return *this;
+    }
+
+    operator const VkDebugUtilsObjectNameInfoEXT&() const
+    {
+      return *reinterpret_cast<const VkDebugUtilsObjectNameInfoEXT*>(this);
+    }
+
+    bool operator==( DebugUtilsObjectNameInfoEXT const& rhs ) const
+    {
+      return ( sType == rhs.sType )
+          && ( pNext == rhs.pNext )
+          && ( objectType == rhs.objectType )
+          && ( objectHandle == rhs.objectHandle )
+          && ( pObjectName == rhs.pObjectName );
+    }
+
+    bool operator!=( DebugUtilsObjectNameInfoEXT const& rhs ) const
+    {
+      return !operator==( rhs );
+    }
+
+  private:
+    StructureType sType;
+
+  public:
+    const void* pNext;
+    ObjectType objectType;
+    uint64_t objectHandle;
+    const char* pObjectName;
+  };
+  static_assert( sizeof( DebugUtilsObjectNameInfoEXT ) == sizeof( VkDebugUtilsObjectNameInfoEXT ), "struct and wrapper have different size!" );
+
+  struct DebugUtilsObjectTagInfoEXT
+  {
+    DebugUtilsObjectTagInfoEXT( ObjectType objectType_ = ObjectType::eUnknown, uint64_t objectHandle_ = 0, uint64_t tagName_ = 0, size_t tagSize_ = 0, const void* pTag_ = nullptr )
+      : sType( StructureType::eDebugUtilsObjectTagInfoEXT )
+      , pNext( nullptr )
+      , objectType( objectType_ )
+      , objectHandle( objectHandle_ )
+      , tagName( tagName_ )
+      , tagSize( tagSize_ )
+      , pTag( pTag_ )
+    {
+    }
+
+    DebugUtilsObjectTagInfoEXT( VkDebugUtilsObjectTagInfoEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsObjectTagInfoEXT ) );
+    }
+
+    DebugUtilsObjectTagInfoEXT& operator=( VkDebugUtilsObjectTagInfoEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsObjectTagInfoEXT ) );
+      return *this;
+    }
+    DebugUtilsObjectTagInfoEXT& setPNext( const void* pNext_ )
+    {
+      pNext = pNext_;
+      return *this;
+    }
+
+    DebugUtilsObjectTagInfoEXT& setObjectType( ObjectType objectType_ )
+    {
+      objectType = objectType_;
+      return *this;
+    }
+
+    DebugUtilsObjectTagInfoEXT& setObjectHandle( uint64_t objectHandle_ )
+    {
+      objectHandle = objectHandle_;
+      return *this;
+    }
+
+    DebugUtilsObjectTagInfoEXT& setTagName( uint64_t tagName_ )
+    {
+      tagName = tagName_;
+      return *this;
+    }
+
+    DebugUtilsObjectTagInfoEXT& setTagSize( size_t tagSize_ )
+    {
+      tagSize = tagSize_;
+      return *this;
+    }
+
+    DebugUtilsObjectTagInfoEXT& setPTag( const void* pTag_ )
+    {
+      pTag = pTag_;
+      return *this;
+    }
+
+    operator const VkDebugUtilsObjectTagInfoEXT&() const
+    {
+      return *reinterpret_cast<const VkDebugUtilsObjectTagInfoEXT*>(this);
+    }
+
+    bool operator==( DebugUtilsObjectTagInfoEXT const& rhs ) const
+    {
+      return ( sType == rhs.sType )
+          && ( pNext == rhs.pNext )
+          && ( objectType == rhs.objectType )
+          && ( objectHandle == rhs.objectHandle )
+          && ( tagName == rhs.tagName )
+          && ( tagSize == rhs.tagSize )
+          && ( pTag == rhs.pTag );
+    }
+
+    bool operator!=( DebugUtilsObjectTagInfoEXT const& rhs ) const
+    {
+      return !operator==( rhs );
+    }
+
+  private:
+    StructureType sType;
+
+  public:
+    const void* pNext;
+    ObjectType objectType;
+    uint64_t objectHandle;
+    uint64_t tagName;
+    size_t tagSize;
+    const void* pTag;
+  };
+  static_assert( sizeof( DebugUtilsObjectTagInfoEXT ) == sizeof( VkDebugUtilsObjectTagInfoEXT ), "struct and wrapper have different size!" );
+
+  struct DebugUtilsMessengerCallbackDataEXT
+  {
+    DebugUtilsMessengerCallbackDataEXT( DebugUtilsMessengerCallbackDataFlagsEXT flags_ = DebugUtilsMessengerCallbackDataFlagsEXT(), const char* pMessageSource_ = nullptr, int32_t messageNumber_ = 0, const char* pMessage_ = nullptr, uint8_t queueLabelCount_ = 0, const DebugUtilsLabelEXT* pQueueLabels_ = nullptr, uint8_t cmdBufLabelCount_ = 0, const DebugUtilsLabelEXT* pCmdBufLabels_ = nullptr, uint8_t objectCount_ = 0, const DebugUtilsObjectNameInfoEXT* pObjects_ = nullptr )
+      : sType( StructureType::eDebugUtilsMessengerCallbackDataEXT )
+      , pNext( nullptr )
+      , flags( flags_ )
+      , pMessageSource( pMessageSource_ )
+      , messageNumber( messageNumber_ )
+      , pMessage( pMessage_ )
+      , queueLabelCount( queueLabelCount_ )
+      , pQueueLabels( pQueueLabels_ )
+      , cmdBufLabelCount( cmdBufLabelCount_ )
+      , pCmdBufLabels( pCmdBufLabels_ )
+      , objectCount( objectCount_ )
+      , pObjects( pObjects_ )
+    {
+    }
+
+    DebugUtilsMessengerCallbackDataEXT( VkDebugUtilsMessengerCallbackDataEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsMessengerCallbackDataEXT ) );
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& operator=( VkDebugUtilsMessengerCallbackDataEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsMessengerCallbackDataEXT ) );
+      return *this;
+    }
+    DebugUtilsMessengerCallbackDataEXT& setPNext( const void* pNext_ )
+    {
+      pNext = pNext_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setFlags( DebugUtilsMessengerCallbackDataFlagsEXT flags_ )
+    {
+      flags = flags_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setPMessageSource( const char* pMessageSource_ )
+    {
+      pMessageSource = pMessageSource_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setMessageNumber( int32_t messageNumber_ )
+    {
+      messageNumber = messageNumber_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setPMessage( const char* pMessage_ )
+    {
+      pMessage = pMessage_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setQueueLabelCount( uint8_t queueLabelCount_ )
+    {
+      queueLabelCount = queueLabelCount_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setPQueueLabels( const DebugUtilsLabelEXT* pQueueLabels_ )
+    {
+      pQueueLabels = pQueueLabels_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setCmdBufLabelCount( uint8_t cmdBufLabelCount_ )
+    {
+      cmdBufLabelCount = cmdBufLabelCount_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setPCmdBufLabels( const DebugUtilsLabelEXT* pCmdBufLabels_ )
+    {
+      pCmdBufLabels = pCmdBufLabels_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setObjectCount( uint8_t objectCount_ )
+    {
+      objectCount = objectCount_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCallbackDataEXT& setPObjects( const DebugUtilsObjectNameInfoEXT* pObjects_ )
+    {
+      pObjects = pObjects_;
+      return *this;
+    }
+
+    operator const VkDebugUtilsMessengerCallbackDataEXT&() const
+    {
+      return *reinterpret_cast<const VkDebugUtilsMessengerCallbackDataEXT*>(this);
+    }
+
+    bool operator==( DebugUtilsMessengerCallbackDataEXT const& rhs ) const
+    {
+      return ( sType == rhs.sType )
+          && ( pNext == rhs.pNext )
+          && ( flags == rhs.flags )
+          && ( pMessageSource == rhs.pMessageSource )
+          && ( messageNumber == rhs.messageNumber )
+          && ( pMessage == rhs.pMessage )
+          && ( queueLabelCount == rhs.queueLabelCount )
+          && ( pQueueLabels == rhs.pQueueLabels )
+          && ( cmdBufLabelCount == rhs.cmdBufLabelCount )
+          && ( pCmdBufLabels == rhs.pCmdBufLabels )
+          && ( objectCount == rhs.objectCount )
+          && ( pObjects == rhs.pObjects );
+    }
+
+    bool operator!=( DebugUtilsMessengerCallbackDataEXT const& rhs ) const
+    {
+      return !operator==( rhs );
+    }
+
+  private:
+    StructureType sType;
+
+  public:
+    const void* pNext;
+    DebugUtilsMessengerCallbackDataFlagsEXT flags;
+    const char* pMessageSource;
+    int32_t messageNumber;
+    const char* pMessage;
+    uint8_t queueLabelCount;
+    const DebugUtilsLabelEXT* pQueueLabels;
+    uint8_t cmdBufLabelCount;
+    const DebugUtilsLabelEXT* pCmdBufLabels;
+    uint8_t objectCount;
+    const DebugUtilsObjectNameInfoEXT* pObjects;
+  };
+  static_assert( sizeof( DebugUtilsMessengerCallbackDataEXT ) == sizeof( VkDebugUtilsMessengerCallbackDataEXT ), "struct and wrapper have different size!" );
 
   enum class QueueFlagBits
   {
@@ -21893,6 +22426,154 @@ namespace vk
   };
   static_assert( sizeof( RenderPassCreateInfo ) == sizeof( VkRenderPassCreateInfo ), "struct and wrapper have different size!" );
 
+  enum class DebugUtilsMessageSeverityFlagBitsEXT
+  {
+    eVerbose = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+    eInfo = VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT,
+    eWarning = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT,
+    eError = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
+  };
+
+  using DebugUtilsMessageSeverityFlagsEXT = Flags<DebugUtilsMessageSeverityFlagBitsEXT, VkDebugUtilsMessageSeverityFlagsEXT>;
+
+  VULKAN_HPP_INLINE DebugUtilsMessageSeverityFlagsEXT operator|( DebugUtilsMessageSeverityFlagBitsEXT bit0, DebugUtilsMessageSeverityFlagBitsEXT bit1 )
+  {
+    return DebugUtilsMessageSeverityFlagsEXT( bit0 ) | bit1;
+  }
+
+  VULKAN_HPP_INLINE DebugUtilsMessageSeverityFlagsEXT operator~( DebugUtilsMessageSeverityFlagBitsEXT bits )
+  {
+    return ~( DebugUtilsMessageSeverityFlagsEXT( bits ) );
+  }
+
+  template <> struct FlagTraits<DebugUtilsMessageSeverityFlagBitsEXT>
+  {
+    enum
+    {
+      allFlags = VkFlags(DebugUtilsMessageSeverityFlagBitsEXT::eVerbose) | VkFlags(DebugUtilsMessageSeverityFlagBitsEXT::eInfo) | VkFlags(DebugUtilsMessageSeverityFlagBitsEXT::eWarning) | VkFlags(DebugUtilsMessageSeverityFlagBitsEXT::eError)
+    };
+  };
+
+  enum class DebugUtilsMessageTypeFlagBitsEXT
+  {
+    eGeneral = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT,
+    eSpecification = VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT,
+    ePerformance = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+  };
+
+  using DebugUtilsMessageTypeFlagsEXT = Flags<DebugUtilsMessageTypeFlagBitsEXT, VkDebugUtilsMessageTypeFlagsEXT>;
+
+  VULKAN_HPP_INLINE DebugUtilsMessageTypeFlagsEXT operator|( DebugUtilsMessageTypeFlagBitsEXT bit0, DebugUtilsMessageTypeFlagBitsEXT bit1 )
+  {
+    return DebugUtilsMessageTypeFlagsEXT( bit0 ) | bit1;
+  }
+
+  VULKAN_HPP_INLINE DebugUtilsMessageTypeFlagsEXT operator~( DebugUtilsMessageTypeFlagBitsEXT bits )
+  {
+    return ~( DebugUtilsMessageTypeFlagsEXT( bits ) );
+  }
+
+  template <> struct FlagTraits<DebugUtilsMessageTypeFlagBitsEXT>
+  {
+    enum
+    {
+      allFlags = VkFlags(DebugUtilsMessageTypeFlagBitsEXT::eGeneral) | VkFlags(DebugUtilsMessageTypeFlagBitsEXT::eSpecification) | VkFlags(DebugUtilsMessageTypeFlagBitsEXT::ePerformance)
+    };
+  };
+
+  struct DebugUtilsMessengerCreateInfoEXT
+  {
+    DebugUtilsMessengerCreateInfoEXT( DebugUtilsMessengerCreateFlagsEXT flags_ = DebugUtilsMessengerCreateFlagsEXT(), DebugUtilsMessageSeverityFlagsEXT messageSeverity_ = DebugUtilsMessageSeverityFlagsEXT(), DebugUtilsMessageTypeFlagsEXT messageType_ = DebugUtilsMessageTypeFlagsEXT(), PFN_vkDebugUtilsMessengerCallbackEXT pfnUserCallback_ = nullptr, void* pUserData_ = nullptr )
+      : sType( StructureType::eDebugUtilsMessengerCreateInfoEXT )
+      , pNext( nullptr )
+      , flags( flags_ )
+      , messageSeverity( messageSeverity_ )
+      , messageType( messageType_ )
+      , pfnUserCallback( pfnUserCallback_ )
+      , pUserData( pUserData_ )
+    {
+    }
+
+    DebugUtilsMessengerCreateInfoEXT( VkDebugUtilsMessengerCreateInfoEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsMessengerCreateInfoEXT ) );
+    }
+
+    DebugUtilsMessengerCreateInfoEXT& operator=( VkDebugUtilsMessengerCreateInfoEXT const & rhs )
+    {
+      memcpy( this, &rhs, sizeof( DebugUtilsMessengerCreateInfoEXT ) );
+      return *this;
+    }
+    DebugUtilsMessengerCreateInfoEXT& setPNext( const void* pNext_ )
+    {
+      pNext = pNext_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCreateInfoEXT& setFlags( DebugUtilsMessengerCreateFlagsEXT flags_ )
+    {
+      flags = flags_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCreateInfoEXT& setMessageSeverity( DebugUtilsMessageSeverityFlagsEXT messageSeverity_ )
+    {
+      messageSeverity = messageSeverity_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCreateInfoEXT& setMessageType( DebugUtilsMessageTypeFlagsEXT messageType_ )
+    {
+      messageType = messageType_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCreateInfoEXT& setPfnUserCallback( PFN_vkDebugUtilsMessengerCallbackEXT pfnUserCallback_ )
+    {
+      pfnUserCallback = pfnUserCallback_;
+      return *this;
+    }
+
+    DebugUtilsMessengerCreateInfoEXT& setPUserData( void* pUserData_ )
+    {
+      pUserData = pUserData_;
+      return *this;
+    }
+
+    operator const VkDebugUtilsMessengerCreateInfoEXT&() const
+    {
+      return *reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT*>(this);
+    }
+
+    bool operator==( DebugUtilsMessengerCreateInfoEXT const& rhs ) const
+    {
+      return ( sType == rhs.sType )
+          && ( pNext == rhs.pNext )
+          && ( flags == rhs.flags )
+          && ( messageSeverity == rhs.messageSeverity )
+          && ( messageType == rhs.messageType )
+          && ( pfnUserCallback == rhs.pfnUserCallback )
+          && ( pUserData == rhs.pUserData );
+    }
+
+    bool operator!=( DebugUtilsMessengerCreateInfoEXT const& rhs ) const
+    {
+      return !operator==( rhs );
+    }
+
+  private:
+    StructureType sType;
+
+  public:
+    const void* pNext;
+    DebugUtilsMessengerCreateFlagsEXT flags;
+    DebugUtilsMessageSeverityFlagsEXT messageSeverity;
+    DebugUtilsMessageTypeFlagsEXT messageType;
+    PFN_vkDebugUtilsMessengerCallbackEXT pfnUserCallback;
+    void* pUserData;
+  };
+  static_assert( sizeof( DebugUtilsMessengerCreateInfoEXT ) == sizeof( VkDebugUtilsMessengerCreateInfoEXT ), "struct and wrapper have different size!" );
+
   Result enumerateInstanceLayerProperties( uint32_t* pPropertyCount, LayerProperties* pProperties );
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
   template <typename Allocator = std::allocator<LayerProperties>> 
@@ -22215,6 +22896,18 @@ namespace vk
     void setDiscardRectangleEXT( uint32_t firstDiscardRectangle, uint32_t discardRectangleCount, const Rect2D* pDiscardRectangles ) const;
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
     void setDiscardRectangleEXT( uint32_t firstDiscardRectangle, ArrayProxy<const Rect2D> discardRectangles ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+    void beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    void beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+    void endDebugUtilsLabelEXT() const;
+
+    void insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    void insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const;
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 
 
@@ -22733,6 +23426,33 @@ namespace vk
   }
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 
+  VULKAN_HPP_INLINE void CommandBuffer::beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const
+  {
+    vkCmdBeginDebugUtilsLabelEXT( m_commandBuffer, reinterpret_cast<const VkDebugUtilsLabelEXT*>( pLabelInfo ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE void CommandBuffer::beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const
+  {
+    vkCmdBeginDebugUtilsLabelEXT( m_commandBuffer, reinterpret_cast<const VkDebugUtilsLabelEXT*>( &labelInfo ) );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+  VULKAN_HPP_INLINE void CommandBuffer::endDebugUtilsLabelEXT() const
+  {
+    vkCmdEndDebugUtilsLabelEXT( m_commandBuffer );
+  }
+
+  VULKAN_HPP_INLINE void CommandBuffer::insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const
+  {
+    vkCmdInsertDebugUtilsLabelEXT( m_commandBuffer, reinterpret_cast<const VkDebugUtilsLabelEXT*>( pLabelInfo ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE void CommandBuffer::insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const
+  {
+    vkCmdInsertDebugUtilsLabelEXT( m_commandBuffer, reinterpret_cast<const VkDebugUtilsLabelEXT*>( &labelInfo ) );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
   struct SubmitInfo
   {
     SubmitInfo( uint32_t waitSemaphoreCount_ = 0, const Semaphore* pWaitSemaphores_ = nullptr, const PipelineStageFlags* pWaitDstStageMask_ = nullptr, uint32_t commandBufferCount_ = 0, const CommandBuffer* pCommandBuffers_ = nullptr, uint32_t signalSemaphoreCount_ = 0, const Semaphore* pSignalSemaphores_ = nullptr )
@@ -22909,6 +23629,18 @@ namespace vk
     Result presentKHR( const PresentInfoKHR & presentInfo ) const;
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 
+    void beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    void beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+    void endDebugUtilsLabelEXT() const;
+
+    void insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    void insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
 
 
     VULKAN_HPP_TYPESAFE_EXPLICIT operator VkQueue() const
@@ -22978,6 +23710,33 @@ namespace vk
   {
     Result result = static_cast<Result>( vkQueuePresentKHR( m_queue, reinterpret_cast<const VkPresentInfoKHR*>( &presentInfo ) ) );
     return createResultValue( result, "vk::Queue::presentKHR", { Result::eSuccess, Result::eSuboptimalKHR } );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+  VULKAN_HPP_INLINE void Queue::beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const
+  {
+    vkQueueBeginDebugUtilsLabelEXT( m_queue, reinterpret_cast<const VkDebugUtilsLabelEXT*>( pLabelInfo ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE void Queue::beginDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const
+  {
+    vkQueueBeginDebugUtilsLabelEXT( m_queue, reinterpret_cast<const VkDebugUtilsLabelEXT*>( &labelInfo ) );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+  VULKAN_HPP_INLINE void Queue::endDebugUtilsLabelEXT() const
+  {
+    vkQueueEndDebugUtilsLabelEXT( m_queue );
+  }
+
+  VULKAN_HPP_INLINE void Queue::insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT* pLabelInfo ) const
+  {
+    vkQueueInsertDebugUtilsLabelEXT( m_queue, reinterpret_cast<const VkDebugUtilsLabelEXT*>( pLabelInfo ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE void Queue::insertDebugUtilsLabelEXT( const DebugUtilsLabelEXT & labelInfo ) const
+  {
+    vkQueueInsertDebugUtilsLabelEXT( m_queue, reinterpret_cast<const VkDebugUtilsLabelEXT*>( &labelInfo ) );
   }
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 
@@ -23736,6 +24495,16 @@ namespace vk
 #ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
     template <typename Allocator = std::allocator<PastPresentationTimingGOOGLE>> 
     typename ResultValueType<std::vector<PastPresentationTimingGOOGLE,Allocator>>::type getPastPresentationTimingGOOGLE( SwapchainKHR swapchain ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+    Result setDebugUtilsObjectNameEXT( const DebugUtilsObjectNameInfoEXT* pNameInfo ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    ResultValueType<void>::type setDebugUtilsObjectNameEXT( const DebugUtilsObjectNameInfoEXT & nameInfo ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+    Result setDebugUtilsObjectTagEXT( const DebugUtilsObjectTagInfoEXT* pTagInfo ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    ResultValueType<void>::type setDebugUtilsObjectTagEXT( const DebugUtilsObjectTagInfoEXT & tagInfo ) const;
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 
 
@@ -25901,6 +26670,30 @@ namespace vk
   }
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 
+  VULKAN_HPP_INLINE Result Device::setDebugUtilsObjectNameEXT( const DebugUtilsObjectNameInfoEXT* pNameInfo ) const
+  {
+    return static_cast<Result>( vkSetDebugUtilsObjectNameEXT( m_device, reinterpret_cast<const VkDebugUtilsObjectNameInfoEXT*>( pNameInfo ) ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE ResultValueType<void>::type Device::setDebugUtilsObjectNameEXT( const DebugUtilsObjectNameInfoEXT & nameInfo ) const
+  {
+    Result result = static_cast<Result>( vkSetDebugUtilsObjectNameEXT( m_device, reinterpret_cast<const VkDebugUtilsObjectNameInfoEXT*>( &nameInfo ) ) );
+    return createResultValue( result, "vk::Device::setDebugUtilsObjectNameEXT" );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+  VULKAN_HPP_INLINE Result Device::setDebugUtilsObjectTagEXT( const DebugUtilsObjectTagInfoEXT* pTagInfo ) const
+  {
+    return static_cast<Result>( vkSetDebugUtilsObjectTagEXT( m_device, reinterpret_cast<const VkDebugUtilsObjectTagInfoEXT*>( pTagInfo ) ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE ResultValueType<void>::type Device::setDebugUtilsObjectTagEXT( const DebugUtilsObjectTagInfoEXT & tagInfo ) const
+  {
+    Result result = static_cast<Result>( vkSetDebugUtilsObjectTagEXT( m_device, reinterpret_cast<const VkDebugUtilsObjectTagInfoEXT*>( &tagInfo ) ) );
+    return createResultValue( result, "vk::Device::setDebugUtilsObjectTagEXT" );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
 #ifndef VULKAN_HPP_NO_SMART_HANDLE
   class DeviceDeleter;
   using UniqueDevice = UniqueHandle<Device, DeviceDeleter>;
@@ -27118,6 +27911,8 @@ namespace vk
 #ifndef VULKAN_HPP_NO_SMART_HANDLE
   class DebugReportCallbackEXTDeleter;
   using UniqueDebugReportCallbackEXT = UniqueHandle<DebugReportCallbackEXT, DebugReportCallbackEXTDeleter>;
+  class DebugUtilsMessengerEXTDeleter;
+  using UniqueDebugUtilsMessengerEXT = UniqueHandle<DebugUtilsMessengerEXT, DebugUtilsMessengerEXTDeleter>;
   class SurfaceKHRDeleter;
   using UniqueSurfaceKHR = UniqueHandle<SurfaceKHR, SurfaceKHRDeleter>;
 #endif /*VULKAN_HPP_NO_SMART_HANDLE*/
@@ -27309,6 +28104,24 @@ namespace vk
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 #endif /*VK_USE_PLATFORM_MACOS_MVK*/
 
+    Result createDebugUtilsMessengerEXT( const DebugUtilsMessengerCreateInfoEXT* pCreateInfo, const AllocationCallbacks* pAllocator, DebugUtilsMessengerEXT* pMessenger ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    ResultValueType<DebugUtilsMessengerEXT>::type createDebugUtilsMessengerEXT( const DebugUtilsMessengerCreateInfoEXT & createInfo, Optional<const AllocationCallbacks> allocator = nullptr ) const;
+#ifndef VULKAN_HPP_NO_SMART_HANDLE
+    UniqueDebugUtilsMessengerEXT createDebugUtilsMessengerEXTUnique( const DebugUtilsMessengerCreateInfoEXT & createInfo, Optional<const AllocationCallbacks> allocator = nullptr ) const;
+#endif /*VULKAN_HPP_NO_SMART_HANDLE*/
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+    void destroyDebugUtilsMessengerEXT( DebugUtilsMessengerEXT messenger, const AllocationCallbacks* pAllocator ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    void destroyDebugUtilsMessengerEXT( DebugUtilsMessengerEXT messenger, Optional<const AllocationCallbacks> allocator = nullptr ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+    void submitDebugUtilsMessageEXT( DebugUtilsMessageSeverityFlagBitsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, const DebugUtilsMessengerCallbackDataEXT* pCallbackData ) const;
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+    void submitDebugUtilsMessageEXT( DebugUtilsMessageSeverityFlagBitsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, const DebugUtilsMessengerCallbackDataEXT & callbackData ) const;
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
 
 
     VULKAN_HPP_TYPESAFE_EXPLICIT operator VkInstance() const
@@ -27344,6 +28157,24 @@ namespace vk
     void operator()( DebugReportCallbackEXT debugReportCallbackEXT )
     {
       m_instance.destroyDebugReportCallbackEXT( debugReportCallbackEXT, m_allocator );
+    }
+
+  private:
+    Instance m_instance;
+    Optional<const AllocationCallbacks> m_allocator;
+  };
+
+  class DebugUtilsMessengerEXTDeleter
+  {
+  public:
+    DebugUtilsMessengerEXTDeleter( Instance instance = Instance(), Optional<const AllocationCallbacks> allocator = nullptr )
+      : m_instance( instance )
+      , m_allocator( allocator )
+    {}
+
+    void operator()( DebugUtilsMessengerEXT debugUtilsMessengerEXT )
+    {
+      m_instance.destroyDebugUtilsMessengerEXT( debugUtilsMessengerEXT, m_allocator );
     }
 
   private:
@@ -27722,6 +28553,48 @@ namespace vk
 #endif /*VULKAN_HPP_NO_SMART_HANDLE*/
 #endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 #endif /*VK_USE_PLATFORM_MACOS_MVK*/
+
+  VULKAN_HPP_INLINE Result Instance::createDebugUtilsMessengerEXT( const DebugUtilsMessengerCreateInfoEXT* pCreateInfo, const AllocationCallbacks* pAllocator, DebugUtilsMessengerEXT* pMessenger ) const
+  {
+    return static_cast<Result>( vkCreateDebugUtilsMessengerEXT( m_instance, reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT*>( pCreateInfo ), reinterpret_cast<const VkAllocationCallbacks*>( pAllocator ), reinterpret_cast<VkDebugUtilsMessengerEXT*>( pMessenger ) ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE ResultValueType<DebugUtilsMessengerEXT>::type Instance::createDebugUtilsMessengerEXT( const DebugUtilsMessengerCreateInfoEXT & createInfo, Optional<const AllocationCallbacks> allocator ) const
+  {
+    DebugUtilsMessengerEXT messenger;
+    Result result = static_cast<Result>( vkCreateDebugUtilsMessengerEXT( m_instance, reinterpret_cast<const VkDebugUtilsMessengerCreateInfoEXT*>( &createInfo ), reinterpret_cast<const VkAllocationCallbacks*>( static_cast<const AllocationCallbacks*>( allocator ) ), reinterpret_cast<VkDebugUtilsMessengerEXT*>( &messenger ) ) );
+    return createResultValue( result, messenger, "vk::Instance::createDebugUtilsMessengerEXT" );
+  }
+#ifndef VULKAN_HPP_NO_SMART_HANDLE
+  VULKAN_HPP_INLINE UniqueDebugUtilsMessengerEXT Instance::createDebugUtilsMessengerEXTUnique( const DebugUtilsMessengerCreateInfoEXT & createInfo, Optional<const AllocationCallbacks> allocator ) const
+  {
+    DebugUtilsMessengerEXTDeleter deleter( *this, allocator );
+    return UniqueDebugUtilsMessengerEXT( createDebugUtilsMessengerEXT( createInfo, allocator ), deleter );
+  }
+#endif /*VULKAN_HPP_NO_SMART_HANDLE*/
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+  VULKAN_HPP_INLINE void Instance::destroyDebugUtilsMessengerEXT( DebugUtilsMessengerEXT messenger, const AllocationCallbacks* pAllocator ) const
+  {
+    vkDestroyDebugUtilsMessengerEXT( m_instance, static_cast<VkDebugUtilsMessengerEXT>( messenger ), reinterpret_cast<const VkAllocationCallbacks*>( pAllocator ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE void Instance::destroyDebugUtilsMessengerEXT( DebugUtilsMessengerEXT messenger, Optional<const AllocationCallbacks> allocator ) const
+  {
+    vkDestroyDebugUtilsMessengerEXT( m_instance, static_cast<VkDebugUtilsMessengerEXT>( messenger ), reinterpret_cast<const VkAllocationCallbacks*>( static_cast<const AllocationCallbacks*>( allocator ) ) );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
+
+  VULKAN_HPP_INLINE void Instance::submitDebugUtilsMessageEXT( DebugUtilsMessageSeverityFlagBitsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, const DebugUtilsMessengerCallbackDataEXT* pCallbackData ) const
+  {
+    vkSubmitDebugUtilsMessageEXT( m_instance, static_cast<VkDebugUtilsMessageSeverityFlagBitsEXT>( messageSeverity ), static_cast<VkDebugUtilsMessageTypeFlagsEXT>( messageTypes ), reinterpret_cast<const VkDebugUtilsMessengerCallbackDataEXT*>( pCallbackData ) );
+  }
+#ifndef VULKAN_HPP_DISABLE_ENHANCED_MODE
+  VULKAN_HPP_INLINE void Instance::submitDebugUtilsMessageEXT( DebugUtilsMessageSeverityFlagBitsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, const DebugUtilsMessengerCallbackDataEXT & callbackData ) const
+  {
+    vkSubmitDebugUtilsMessageEXT( m_instance, static_cast<VkDebugUtilsMessageSeverityFlagBitsEXT>( messageSeverity ), static_cast<VkDebugUtilsMessageTypeFlagsEXT>( messageTypes ), reinterpret_cast<const VkDebugUtilsMessengerCallbackDataEXT*>( &callbackData ) );
+  }
+#endif /*VULKAN_HPP_DISABLE_ENHANCED_MODE*/
 
   struct DeviceGroupDeviceCreateInfoKHX
   {
@@ -28287,6 +29160,36 @@ namespace vk
     return "{}";
   }
 
+  VULKAN_HPP_INLINE std::string to_string(PipelineCoverageToColorStateCreateFlagBitsNV)
+  {
+    return "(void)";
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(PipelineCoverageToColorStateCreateFlagsNV)
+  {
+    return "{}";
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessengerCreateFlagBitsEXT)
+  {
+    return "(void)";
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessengerCreateFlagsEXT)
+  {
+    return "{}";
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessengerCallbackDataFlagBitsEXT)
+  {
+    return "(void)";
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessengerCallbackDataFlagsEXT)
+  {
+    return "{}";
+  }
+
   VULKAN_HPP_INLINE std::string to_string(ImageLayout value)
   {
     switch (value)
@@ -28547,6 +29450,7 @@ namespace vk
     case PolygonMode::eFill: return "Fill";
     case PolygonMode::eLine: return "Line";
     case PolygonMode::ePoint: return "Point";
+    case PolygonMode::eFillRectangleNV: return "FillRectangleNV";
     default: return "invalid";
     }
   }
@@ -29065,6 +29969,12 @@ namespace vk
     case StructureType::eSurfaceFormat2KHR: return "SurfaceFormat2KHR";
     case StructureType::eIosSurfaceCreateInfoMVK: return "IosSurfaceCreateInfoMVK";
     case StructureType::eMacosSurfaceCreateInfoMVK: return "MacosSurfaceCreateInfoMVK";
+    case StructureType::eDebugUtilsObjectNameInfoEXT: return "DebugUtilsObjectNameInfoEXT";
+    case StructureType::eDebugUtilsObjectTagInfoEXT: return "DebugUtilsObjectTagInfoEXT";
+    case StructureType::eDebugUtilsLabelEXT: return "DebugUtilsLabelEXT";
+    case StructureType::eDebugUtilsMessengerCallbackDataEXT: return "DebugUtilsMessengerCallbackDataEXT";
+    case StructureType::eDebugUtilsMessengerCreateInfoEXT: return "DebugUtilsMessengerCreateInfoEXT";
+    case StructureType::ePipelineCoverageToColorStateCreateInfoNV: return "PipelineCoverageToColorStateCreateInfoNV";
     default: return "invalid";
     }
   }
@@ -29146,6 +30056,7 @@ namespace vk
     case ObjectType::eDescriptorUpdateTemplateKHR: return "DescriptorUpdateTemplateKHR";
     case ObjectType::eObjectTableNVX: return "ObjectTableNVX";
     case ObjectType::eIndirectCommandsLayoutNVX: return "IndirectCommandsLayoutNVX";
+    case ObjectType::eDebugUtilsMessengerEXT: return "DebugUtilsMessengerEXT";
     default: return "invalid";
     }
   }
@@ -30491,6 +31402,50 @@ namespace vk
     std::string result;
     if (value & SubpassDescriptionFlagBits::ePerViewAttributesNVX) result += "PerViewAttributesNVX | ";
     if (value & SubpassDescriptionFlagBits::ePerViewPositionXOnlyNVX) result += "PerViewPositionXOnlyNVX | ";
+    return "{" + result.substr(0, result.size() - 3) + "}";
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessageSeverityFlagBitsEXT value)
+  {
+    switch (value)
+    {
+    case DebugUtilsMessageSeverityFlagBitsEXT::eVerbose: return "Verbose";
+    case DebugUtilsMessageSeverityFlagBitsEXT::eInfo: return "Info";
+    case DebugUtilsMessageSeverityFlagBitsEXT::eWarning: return "Warning";
+    case DebugUtilsMessageSeverityFlagBitsEXT::eError: return "Error";
+    default: return "invalid";
+    }
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessageSeverityFlagsEXT value)
+  {
+    if (!value) return "{}";
+    std::string result;
+    if (value & DebugUtilsMessageSeverityFlagBitsEXT::eVerbose) result += "Verbose | ";
+    if (value & DebugUtilsMessageSeverityFlagBitsEXT::eInfo) result += "Info | ";
+    if (value & DebugUtilsMessageSeverityFlagBitsEXT::eWarning) result += "Warning | ";
+    if (value & DebugUtilsMessageSeverityFlagBitsEXT::eError) result += "Error | ";
+    return "{" + result.substr(0, result.size() - 3) + "}";
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessageTypeFlagBitsEXT value)
+  {
+    switch (value)
+    {
+    case DebugUtilsMessageTypeFlagBitsEXT::eGeneral: return "General";
+    case DebugUtilsMessageTypeFlagBitsEXT::eSpecification: return "Specification";
+    case DebugUtilsMessageTypeFlagBitsEXT::ePerformance: return "Performance";
+    default: return "invalid";
+    }
+  }
+
+  VULKAN_HPP_INLINE std::string to_string(DebugUtilsMessageTypeFlagsEXT value)
+  {
+    if (!value) return "{}";
+    std::string result;
+    if (value & DebugUtilsMessageTypeFlagBitsEXT::eGeneral) result += "General | ";
+    if (value & DebugUtilsMessageTypeFlagBitsEXT::eSpecification) result += "Specification | ";
+    if (value & DebugUtilsMessageTypeFlagBitsEXT::ePerformance) result += "Performance | ";
     return "{" + result.substr(0, result.size() - 3) + "}";
   }
 
