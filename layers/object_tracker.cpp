@@ -50,7 +50,8 @@ namespace object_tracker {
 static uint32_t loader_layer_if_version = CURRENT_LOADER_LAYER_INTERFACE_VERSION;
 
 static void InitObjectTracker(layer_data *my_data, const VkAllocationCallbacks *pAllocator) {
-    layer_debug_actions(my_data->report_data, my_data->logging_callback, pAllocator, "lunarg_object_tracker");
+    layer_debug_report_actions(my_data->report_data, my_data->logging_callback, pAllocator, "lunarg_object_tracker");
+    layer_debug_messenger_actions(my_data->report_data, my_data->logging_messenger, pAllocator, "lunarg_object_tracker");
 }
 
 // Add new queue to head of global queue list
@@ -388,9 +389,16 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
 
     // Enable the temporary callback(s) here to catch cleanup issues:
     bool callback_setup = false;
-    if (instance_data->num_tmp_callbacks > 0) {
-        if (!layer_enable_tmp_callbacks(instance_data->report_data, instance_data->num_tmp_callbacks,
-                                        instance_data->tmp_dbg_create_infos, instance_data->tmp_callbacks)) {
+    if (instance_data->num_tmp_debug_messengers > 0) {
+        if (!layer_enable_tmp_debug_messengers(instance_data->report_data, instance_data->num_tmp_debug_messengers,
+                                                  instance_data->tmp_messenger_create_infos,
+                                                  instance_data->tmp_debug_messengers)) {
+            callback_setup = true;
+        }
+    }
+    if (instance_data->num_tmp_report_callbacks > 0) {
+        if (!layer_enable_tmp_report_callbacks(instance_data->report_data, instance_data->num_tmp_report_callbacks,
+                                               instance_data->tmp_report_create_infos, instance_data->tmp_report_callbacks)) {
             callback_setup = true;
         }
     }
@@ -458,21 +466,33 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
 
     // Disable and cleanup the temporary callback(s):
     if (callback_setup) {
-        layer_disable_tmp_callbacks(instance_data->report_data, instance_data->num_tmp_callbacks, instance_data->tmp_callbacks);
+        layer_disable_tmp_debug_messengers(instance_data->report_data, instance_data->num_tmp_debug_messengers,
+                                              instance_data->tmp_debug_messengers);
+        layer_disable_tmp_report_callbacks(instance_data->report_data, instance_data->num_tmp_report_callbacks,
+                                           instance_data->tmp_report_callbacks);
     }
-    if (instance_data->num_tmp_callbacks > 0) {
-        layer_free_tmp_callbacks(instance_data->tmp_dbg_create_infos, instance_data->tmp_callbacks);
-        instance_data->num_tmp_callbacks = 0;
+    if (instance_data->num_tmp_debug_messengers > 0) {
+        layer_free_tmp_debug_messengers(instance_data->tmp_messenger_create_infos, instance_data->tmp_debug_messengers);
+        instance_data->num_tmp_debug_messengers = 0;
+    }
+    if (instance_data->num_tmp_report_callbacks > 0) {
+        layer_free_tmp_report_callbacks(instance_data->tmp_report_create_infos, instance_data->tmp_report_callbacks);
+        instance_data->num_tmp_report_callbacks = 0;
     }
 
     // Clean up logging callback, if any
+    while (instance_data->logging_messenger.size() > 0) {
+        VkDebugUtilsMessengerEXT messenger = instance_data->logging_messenger.back();
+        layer_destroy_messenger_callback(instance_data->report_data, messenger, pAllocator);
+        instance_data->logging_messenger.pop_back();
+    }
     while (instance_data->logging_callback.size() > 0) {
         VkDebugReportCallbackEXT callback = instance_data->logging_callback.back();
-        layer_destroy_msg_callback(instance_data->report_data, callback, pAllocator);
+        layer_destroy_report_callback(instance_data->report_data, callback, pAllocator);
         instance_data->logging_callback.pop_back();
     }
 
-    layer_debug_report_destroy_instance(instance_data->report_data);
+    layer_debug_utils_destroy_instance(instance_data->report_data);
     FreeLayerDataPtr(key, layer_data_map);
 
     lock.unlock();
@@ -3211,6 +3231,134 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateSharedSwapchainsKHR(VkDevice device, uint32
     return result;
 }
 
+// VK_EXT_debug_utils commands
+VKAPI_ATTR VkResult VKAPI_CALL SetDebugUtilsObjectNameEXT(VkDevice device, const VkDebugUtilsObjectNameInfoEXT *pNameInfo) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(device, device, kVulkanObjectTypeDevice, false, VALIDATION_ERROR_UNDEFINED, VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    if (skip) {
+        return VK_ERROR_VALIDATION_FAILED_EXT;
+    }
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
+    VkResult result = dev_data->dispatch_table.SetDebugUtilsObjectNameEXT(device, pNameInfo);
+    return result;
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL SetDebugUtilsObjectTagEXT(VkDevice device, const VkDebugUtilsObjectTagInfoEXT *pTagInfo) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(device, device, kVulkanObjectTypeDevice, false, VALIDATION_ERROR_UNDEFINED, VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    if (skip) {
+        return VK_ERROR_VALIDATION_FAILED_EXT;
+    }
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
+    VkResult result = dev_data->dispatch_table.SetDebugUtilsObjectTagEXT(device, pTagInfo);
+    return result;
+}
+
+VKAPI_ATTR void VKAPI_CALL QueueBeginDebugUtilsLabelEXT(VkQueue queue, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(queue, queue, kVulkanObjectTypeQueue, false, VALIDATION_ERROR_UNDEFINED, VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(queue), layer_data_map);
+    if (!skip && dev_data->dispatch_table.QueueBeginDebugUtilsLabelEXT) {
+        dev_data->dispatch_table.QueueBeginDebugUtilsLabelEXT(queue, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL QueueEndDebugUtilsLabelEXT(VkQueue queue) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(queue, queue, kVulkanObjectTypeQueue, false, VALIDATION_ERROR_UNDEFINED, VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(queue), layer_data_map);
+    if (!skip && dev_data->dispatch_table.QueueEndDebugUtilsLabelEXT) {
+        dev_data->dispatch_table.QueueEndDebugUtilsLabelEXT(queue);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL QueueInsertDebugUtilsLabelEXT(VkQueue queue, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(queue, queue, kVulkanObjectTypeQueue, false, VALIDATION_ERROR_UNDEFINED, VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(queue), layer_data_map);
+    if (!skip && dev_data->dispatch_table.QueueInsertDebugUtilsLabelEXT) {
+        dev_data->dispatch_table.QueueInsertDebugUtilsLabelEXT(queue, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL CmdBeginDebugUtilsLabelEXT(VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(commandBuffer, commandBuffer, kVulkanObjectTypeCommandBuffer, false, VALIDATION_ERROR_UNDEFINED,
+                           VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
+    if (!skip && dev_data->dispatch_table.CmdBeginDebugUtilsLabelEXT) {
+        dev_data->dispatch_table.CmdBeginDebugUtilsLabelEXT(commandBuffer, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL CmdEndDebugUtilsLabelEXT(VkCommandBuffer commandBuffer) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(commandBuffer, commandBuffer, kVulkanObjectTypeCommandBuffer, false, VALIDATION_ERROR_UNDEFINED,
+                           VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
+    if (!skip && dev_data->dispatch_table.CmdEndDebugUtilsLabelEXT) {
+        dev_data->dispatch_table.CmdEndDebugUtilsLabelEXT(commandBuffer);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL CmdInsertDebugUtilsLabelEXT(VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = VK_FALSE;
+    std::unique_lock<std::mutex> lock(global_lock);
+    skip |= ValidateObject(commandBuffer, commandBuffer, kVulkanObjectTypeCommandBuffer, false, VALIDATION_ERROR_UNDEFINED,
+                           VALIDATION_ERROR_UNDEFINED);
+    lock.unlock();
+    layer_data *dev_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
+    if (!skip && dev_data->dispatch_table.CmdInsertDebugUtilsLabelEXT) {
+        dev_data->dispatch_table.CmdInsertDebugUtilsLabelEXT(commandBuffer, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL CreateDebugUtilsMessengerEXT(VkInstance instance,
+                                                            const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+                                                            const VkAllocationCallbacks *pAllocator,
+                                                            VkDebugUtilsMessengerEXT *pMessenger) {
+    VkLayerInstanceDispatchTable *pInstanceTable = get_dispatch_table(ot_instance_table_map, instance);
+    VkResult result = pInstanceTable->CreateDebugUtilsMessengerEXT(instance, pCreateInfo, pAllocator, pMessenger);
+    if (VK_SUCCESS == result) {
+        layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(instance), layer_data_map);
+        result = layer_create_messenger_callback(instance_data->report_data, false, pCreateInfo, pAllocator, pMessenger);
+        CreateObject(instance, *pMessenger, kVulkanObjectTypeDebugUtilsMessengerEXT, pAllocator);
+    }
+    return result;
+}
+
+VKAPI_ATTR void VKAPI_CALL DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT messenger,
+                                                         const VkAllocationCallbacks *pAllocator) {
+    VkLayerInstanceDispatchTable *pInstanceTable = get_dispatch_table(ot_instance_table_map, instance);
+    pInstanceTable->DestroyDebugUtilsMessengerEXT(instance, messenger, pAllocator);
+    layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(instance), layer_data_map);
+    layer_destroy_messenger_callback(instance_data->report_data, messenger, pAllocator);
+    DestroyObject(instance, messenger, kVulkanObjectTypeDebugUtilsMessengerEXT, pAllocator, VALIDATION_ERROR_UNDEFINED,
+                  VALIDATION_ERROR_UNDEFINED);
+}
+
+VKAPI_ATTR void VKAPI_CALL SubmitDebugUtilsMessageEXT(VkInstance instance, VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                      VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+                                                      const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData) {
+    VkLayerInstanceDispatchTable *pInstanceTable = get_dispatch_table(ot_instance_table_map, instance);
+    pInstanceTable->SubmitDebugUtilsMessageEXT(instance, messageSeverity, messageTypes, pCallbackData);
+}
+
+// VK_EXT_debug_report commands
 VKAPI_ATTR VkResult VKAPI_CALL CreateDebugReportCallbackEXT(VkInstance instance,
                                                             const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
                                                             const VkAllocationCallbacks *pAllocator,
@@ -3219,7 +3367,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateDebugReportCallbackEXT(VkInstance instance,
     VkResult result = pInstanceTable->CreateDebugReportCallbackEXT(instance, pCreateInfo, pAllocator, pCallback);
     if (VK_SUCCESS == result) {
         layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(instance), layer_data_map);
-        result = layer_create_msg_callback(instance_data->report_data, false, pCreateInfo, pAllocator, pCallback);
+        result = layer_create_report_callback(instance_data->report_data, false, pCreateInfo, pAllocator, pCallback);
         CreateObject(instance, *pCallback, kVulkanObjectTypeDebugReportCallbackEXT, pAllocator);
     }
     return result;
@@ -3230,7 +3378,7 @@ VKAPI_ATTR void VKAPI_CALL DestroyDebugReportCallbackEXT(VkInstance instance, Vk
     VkLayerInstanceDispatchTable *pInstanceTable = get_dispatch_table(ot_instance_table_map, instance);
     pInstanceTable->DestroyDebugReportCallbackEXT(instance, msgCallback, pAllocator);
     layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(instance), layer_data_map);
-    layer_destroy_msg_callback(instance_data->report_data, msgCallback, pAllocator);
+    layer_destroy_report_callback(instance_data->report_data, msgCallback, pAllocator);
     DestroyObject(instance, msgCallback, kVulkanObjectTypeDebugReportCallbackEXT, pAllocator, VALIDATION_ERROR_242009b4,
                   VALIDATION_ERROR_242009b6);
 }
@@ -3242,7 +3390,9 @@ VKAPI_ATTR void VKAPI_CALL DebugReportMessageEXT(VkInstance instance, VkDebugRep
     pInstanceTable->DebugReportMessageEXT(instance, flags, objType, object, location, msgCode, pLayerPrefix, pMsg);
 }
 
-static const VkExtensionProperties instance_extensions[] = {{VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_SPEC_VERSION}};
+static const VkExtensionProperties instance_extensions[] = {
+    {VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_SPEC_VERSION},
+    {VK_EXT_DEBUG_UTILS_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_SPEC_VERSION}};
 
 static const VkLayerProperties globalLayerProps = {"VK_LAYER_LUNARG_object_tracker",
                                                    VK_LAYER_API_VERSION,  // specVersion
@@ -3306,7 +3456,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateDevice(VkPhysicalDevice physicalDevice, con
     }
 
     layer_data *device_data = GetLayerDataPtr(get_dispatch_key(*pDevice), layer_data_map);
-    device_data->report_data = layer_debug_report_create_device(phy_dev_data->report_data, *pDevice);
+    device_data->report_data = layer_debug_utils_create_device(phy_dev_data->report_data, *pDevice);
     layer_init_device_dispatch_table(*pDevice, &device_data->dispatch_table, fpGetDeviceProcAddr);
 
     // Add link back to physDev
@@ -3371,11 +3521,13 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
 
     // Look for one or more debug report create info structures, and copy the
     // callback(s) for each one found (for use by vkDestroyInstance)
-    layer_copy_tmp_callbacks(pCreateInfo->pNext, &instance_data->num_tmp_callbacks, &instance_data->tmp_dbg_create_infos,
-                             &instance_data->tmp_callbacks);
+    layer_copy_tmp_debug_messengers(pCreateInfo->pNext, &instance_data->num_tmp_debug_messengers,
+                                       &instance_data->tmp_messenger_create_infos, &instance_data->tmp_debug_messengers);
+    layer_copy_tmp_report_callbacks(pCreateInfo->pNext, &instance_data->num_tmp_report_callbacks,
+                                    &instance_data->tmp_report_create_infos, &instance_data->tmp_report_callbacks);
 
-    instance_data->report_data = debug_report_create_instance(pInstanceTable, *pInstance, pCreateInfo->enabledExtensionCount,
-                                                              pCreateInfo->ppEnabledExtensionNames);
+    instance_data->report_data = debug_utils_create_instance(pInstanceTable, *pInstance, pCreateInfo->enabledExtensionCount,
+                                                             pCreateInfo->ppEnabledExtensionNames);
 
     InitObjectTracker(instance_data, pAllocator);
 
@@ -5283,6 +5435,18 @@ static const std::unordered_map<std::string, void*> name_to_funcptr_map = {
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
     {"vkCreateAndroidSurfaceKHR", (void*)CreateAndroidSurfaceKHR},
 #endif
+    // VK_EXT_debug_utils extension commands
+    {"vkSetDebugUtilsObjectNameEXT", (void*)SetDebugUtilsObjectNameEXT},
+    {"vkSetDebugUtilsObjectTagEXT", (void*)SetDebugUtilsObjectTagEXT},
+    {"vkQueueBeginDebugUtilsLabelEXT", (void*)QueueBeginDebugUtilsLabelEXT},
+    {"vkQueueEndDebugUtilsLabelEXT", (void*)QueueEndDebugUtilsLabelEXT},
+    {"vkQueueInsertDebugUtilsLabelEXT", (void*)QueueInsertDebugUtilsLabelEXT},
+    {"vkCmdBeginDebugUtilsLabelEXT", (void*)CmdBeginDebugUtilsLabelEXT},
+    {"vkCmdEndDebugUtilsLabelEXT", (void*)CmdEndDebugUtilsLabelEXT},
+    {"vkCmdInsertDebugUtilsLabelEXT", (void*)CmdInsertDebugUtilsLabelEXT},
+    {"vkCreateDebugUtilsMessengerEXT", (void*)CreateDebugUtilsMessengerEXT},
+    {"vkDestroyDebugUtilsMessengerEXT", (void*)DestroyDebugUtilsMessengerEXT},
+    {"vkSubmitDebugUtilsMessageEXT", (void*)SubmitDebugUtilsMessageEXT},
 };
 
 VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL GetDeviceProcAddr(VkDevice device, const char *funcName) {

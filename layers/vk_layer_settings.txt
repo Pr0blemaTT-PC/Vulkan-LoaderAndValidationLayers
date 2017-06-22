@@ -32,7 +32,27 @@
 #       Visual Studio output window, for instance.
 #    VK_DBG_LAYER_ACTION_BREAK - Trigger a breakpoint.
 #
-#   REPORT_FLAGS:
+#   SEVERITY_FLAGS:
+#   =============
+#   <LayerIdentifier>.severity_flags : This is a comma-delineated list of options
+#    telling the layer what level of severity of messages it should report back.
+#    Options are:
+#    error - Report errors in API usage.
+#    warn - Report warnings from using the API in a manner which may lead to
+#           undefined behavior or to warn the user of common trouble spots.
+#           A warning does NOT necessarily signify illegal application behavior.
+#    info - Report informational messages.
+#    verb - For layer development. Report verbose messages typically for
+#           debugging loader and layer behavior.
+#
+#   TYPE_FLAGS:
+#   =============
+#   <LayerIdentifier>.type_flags : This is a comma-delineated list of options
+#    telling the layer what type of messages it should report back.
+#    spec - Report using the API in a way that may violate the Vulkan specification.
+#    perf - Report using the API in a way that may cause suboptimal performance.
+#
+#   REPORT_FLAGS: (Deprecated)
 #   =============
 #   <LayerIdentifier>.report_flags : This is a comma-delineated list of options
 #    telling the layer what types of messages it should report back.
@@ -56,26 +76,31 @@
 
 # VK_LAYER_LUNARG_core_validation Settings
 lunarg_core_validation.debug_action = VK_DBG_LAYER_ACTION_LOG_MSG
-lunarg_core_validation.report_flags = error,warn,perf
+lunarg_core_validation.severity_flags = error,warn
+lunarg_core_validation.type_flags = spec,perf
 lunarg_core_validation.log_filename = stdout
 
 # VK_LAYER_LUNARG_object_tracker Settings
 lunarg_object_tracker.debug_action = VK_DBG_LAYER_ACTION_LOG_MSG
-lunarg_object_tracker.report_flags = error,warn,perf
+lunarg_object_tracker.severity_flags = error,warn
+lunarg_object_tracker.type_flags = spec,perf
 lunarg_object_tracker.log_filename = stdout
 
 # VK_LAYER_LUNARG_parameter_validation Settings
 lunarg_parameter_validation.debug_action = VK_DBG_LAYER_ACTION_LOG_MSG
-lunarg_parameter_validation.report_flags = error,warn,perf
+lunarg_parameter_validation.severity_flags = error,warn
+lunarg_parameter_validation.type_flags = spec,perf
 lunarg_parameter_validation.log_filename = stdout
 
 # VK_LAYER_GOOGLE_threading Settings
 google_threading.debug_action = VK_DBG_LAYER_ACTION_LOG_MSG
-google_threading.report_flags = error,warn,perf
+google_threading.severity_flags = error,warn
+google_threading.type_flags = spec,perf
 google_threading.log_filename = stdout
 
 # VK_LAYER_GOOGLE_unique_objects Settings
 google_unique_objects.debug_action = VK_DBG_LAYER_ACTION_LOG_MSG
-google_unique_objects.report_flags = error,warn,perf
+google_unique_objects.severity_flags = error,warn
+google_unique_objects.type_flags = spec,perf
 google_unique_objects.log_filename = stdout
 ################################################################################

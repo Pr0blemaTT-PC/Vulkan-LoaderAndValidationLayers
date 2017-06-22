@@ -11,6 +11,10 @@
              {
                  "name": "VK_EXT_debug_report",
                  "spec_version": "6"
+             },
+             {
+                 "name": "VK_EXT_debug_utils",
+                 "spec_version": "1"
              }
          ]
     }

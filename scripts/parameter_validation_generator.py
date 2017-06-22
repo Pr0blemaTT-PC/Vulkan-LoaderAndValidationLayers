@@ -135,8 +135,12 @@ class ParamCheckerOutputGenerator(OutputGenerator):
             'vkEnumerateInstanceExtensionsProperties',
             'vkEnumerateDeviceLayerProperties',
             'vkEnumerateDeviceExtensionsProperties',
+            # VK_EXT_debug_report
             'vkCreateDebugReportCallbackEXT',
-            'vkDebugReportMessageEXT']
+            'vkDebugReportMessageEXT',
+            # VK_EXT_debug_utils
+            'vkCreateDebugUtilsMessengerEXT',
+            'vkSubmitDebugUtilsMessageEXT']
         # Structure fields to ignore
         self.structMemberBlacklist = { 'VkWriteDescriptorSet' : ['dstSet'] }
         # Validation conditions for some special case struct members that are conditionally validated

@@ -141,12 +141,18 @@ class UniqueObjectsOutputGenerator(OutputGenerator):
             'vkEnumerateInstanceLayerProperties',
             'vkEnumerateDeviceLayerProperties',
             'vkEnumerateInstanceExtensionProperties',
+            # VK_KHR_update_descriptor_template commands
             'vkCreateDescriptorUpdateTemplateKHR',
             'vkDestroyDescriptorUpdateTemplateKHR',
             'vkUpdateDescriptorSetWithTemplateKHR',
+            # VK_KHR_push_descriptor commands
             'vkCmdPushDescriptorSetWithTemplateKHR',
+            # VK_EXT_debug_marker commands
             'vkDebugMarkerSetObjectTagEXT',
             'vkDebugMarkerSetObjectNameEXT',
+            # VK_EXT_debug_utils commands
+            'vkSetDebugUtilsObjectNameEXT',
+            'vkSetDebugUtilsObjectTagEXT',
             ]
         # Commands shadowed by interface functions and are not implemented
         self.interface_functions = [
@@ -155,10 +161,14 @@ class UniqueObjectsOutputGenerator(OutputGenerator):
             'vkGetDisplayPlaneSupportedDisplaysKHR',
             'vkGetDisplayModePropertiesKHR',
             'vkGetDisplayPlaneCapabilitiesKHR',
-            # DebugReport APIs are hooked, but handled separately in the source file
+            # VK_EXT_debug_report APIs are hooked, but handled separately in the source file
             'vkCreateDebugReportCallbackEXT',
             'vkDestroyDebugReportCallbackEXT',
             'vkDebugReportMessageEXT',
+            # VK_EXT_debug_utils APIs are hooked, but handled separately in the source file
+            'vkCreateDebugUtilsMessengerEXT',
+            'vkDestroyDebugUtilsMessengerEXT',
+            'vkSubmitDebugUtilsMessageEXT',
             ]
         self.headerVersion = None
         # Internal state - accumulators for different inner block text

@@ -50,6 +50,16 @@ const std::unordered_map<std::string, VkFlags> debug_actions_option_definitions 
 #endif
     {std::string("VK_DBG_LAYER_ACTION_DEFAULT"), VK_DBG_LAYER_ACTION_DEFAULT}};
 
+const std::unordered_map<std::string, VkFlags> severity_flags_option_definitions = {
+    {std::string("warn"), VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT},
+    {std::string("info"), VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT},
+    {std::string("error"), VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT},
+    {std::string("verb"), VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT}};
+
+const std::unordered_map<std::string, VkFlags> type_flags_option_definitions = {
+    {std::string("spec"), VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT},
+    {std::string("perf"), VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT}};
+
 const std::unordered_map<std::string, VkFlags> report_flags_option_definitions = {
     {std::string("warn"), VK_DEBUG_REPORT_WARNING_BIT_EXT},
     {std::string("info"), VK_DEBUG_REPORT_INFORMATION_BIT_EXT},
@@ -64,6 +74,8 @@ VkFlags GetLayerOptionFlags(std::string _option, std::unordered_map<std::string,
 
 void setLayerOption(const char *_option, const char *_val);
 void print_msg_flags(VkFlags msgFlags, char *msg_flags);
+void print_msg_severity(VkFlags msgFlags, char *msg_flags);
+void print_msg_type(VkFlags msgFlags, char *msg_flags);
 
 #ifdef __cplusplus
 }

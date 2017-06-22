@@ -272,3 +272,46 @@ void print_msg_flags(VkFlags msgFlags, char *msg_flags) {
         strcat(msg_flags, "ERROR");
     }
 }
+
+void print_msg_severity(VkFlags msgFlags, char *msg_flags) {
+    bool separator = false;
+
+    msg_flags[0] = 0;
+    if (msgFlags & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+        strcat(msg_flags, "VERBOSE");
+        separator = true;
+    }
+    if (msgFlags & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+        if (separator) strcat(msg_flags, ",");
+        strcat(msg_flags, "INFO");
+        separator = true;
+    }
+    if (msgFlags & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+        if (separator) strcat(msg_flags, ",");
+        strcat(msg_flags, "WARN");
+        separator = true;
+    }
+    if (msgFlags & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+        if (separator) strcat(msg_flags, ",");
+        strcat(msg_flags, "ERROR");
+    }
+}
+
+void print_msg_type(VkFlags msgFlags, char *msg_flags) {
+    bool separator = false;
+
+    msg_flags[0] = 0;
+    if (msgFlags & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) {
+        strcat(msg_flags, "GEN");
+        separator = true;
+    }
+    if (msgFlags & VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT) {
+        strcat(msg_flags, "SPEC");
+        separator = true;
+    }
+    if (msgFlags & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
+        if (separator) strcat(msg_flags, ",");
+        strcat(msg_flags, "PERF");
+        separator = true;
+    }
+}

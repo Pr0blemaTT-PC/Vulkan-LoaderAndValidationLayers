@@ -68,7 +68,6 @@ std::string to_string(T var) {
 
 namespace parameter_validation {
 
-
 // TODO : This can be much smarter, using separate locks for separate global data
 static std::mutex global_lock;
 
@@ -77,11 +76,155 @@ static std::unordered_map<void *, layer_data *> layer_data_map;
 static std::unordered_map<void *, instance_layer_data *> instance_layer_data_map;
 
 static void init_parameter_validation(instance_layer_data *my_data, const VkAllocationCallbacks *pAllocator) {
-    layer_debug_actions(my_data->report_data, my_data->logging_callback, pAllocator, "lunarg_parameter_validation");
+    layer_debug_report_actions(my_data->report_data, my_data->logging_callback, pAllocator, "lunarg_parameter_validation");
+    layer_debug_messenger_actions(my_data->report_data, my_data->logging_messenger, pAllocator, "lunarg_parameter_validation");
 }
 
+// VK_EXT_debug_utils commands
+VKAPI_ATTR VkResult VKAPI_CALL SetDebugUtilsObjectTagEXT(VkDevice device, const VkDebugUtilsObjectTagInfoEXT *pTagInfo) {
+    VkResult result = VK_ERROR_VALIDATION_FAILED_EXT;
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
+    assert(my_data != NULL);
 
+    skip |= parameter_validation_vkSetDebugUtilsObjectTagEXT(my_data, pTagInfo);
 
+    if (!skip) {
+        if (my_data->dispatch_table.SetDebugUtilsObjectTagEXT) {
+            result = my_data->dispatch_table.SetDebugUtilsObjectTagEXT(device, pTagInfo);
+            validate_result(my_data->report_data, "vkSetDebugUtilsObjectTagEXT", {}, result);
+        } else {
+            result = VK_SUCCESS;
+        }
+    }
+
+    return result;
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL SetDebugUtilsObjectNameEXT(VkDevice device, const VkDebugUtilsObjectNameInfoEXT *pNameInfo) {
+    VkResult result = VK_ERROR_VALIDATION_FAILED_EXT;
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
+    assert(my_data != NULL);
+
+    skip |= parameter_validation_vkSetDebugUtilsObjectNameEXT(my_data, pNameInfo);
+
+    if (!skip) {
+        if (my_data->dispatch_table.SetDebugUtilsObjectNameEXT) {
+            result = my_data->dispatch_table.SetDebugUtilsObjectNameEXT(device, pNameInfo);
+            validate_result(my_data->report_data, "vkSetDebugUtilsObjectNameEXT", {}, result);
+        } else {
+            result = VK_SUCCESS;
+        }
+    }
+
+    return result;
+}
+
+VKAPI_ATTR void VKAPI_CALL QueueBeginDebugUtilsLabelEXT(VkQueue queue, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(queue), layer_data_map);
+    assert(my_data != NULL);
+
+    skip |= parameter_validation_vkQueueBeginDebugUtilsLabelEXT(my_data, pLabelInfo);
+
+    if (!skip && my_data->dispatch_table.QueueBeginDebugUtilsLabelEXT) {
+        my_data->dispatch_table.QueueBeginDebugUtilsLabelEXT(queue, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL QueueEndDebugUtilsLabelEXT(VkQueue queue) {
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(queue), layer_data_map);
+    assert(my_data != NULL);
+
+#if 0  // No generated validation for this command
+    skip |= parameter_validation_vkQueueEndDebugUtilsLabelEXT(my_data);
+#endif
+
+    if (!skip && my_data->dispatch_table.QueueEndDebugUtilsLabelEXT) {
+        my_data->dispatch_table.QueueEndDebugUtilsLabelEXT(queue);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL QueueInsertDebugUtilsLabelEXT(VkQueue queue, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(queue), layer_data_map);
+    assert(my_data != NULL);
+
+    skip |= parameter_validation_vkQueueInsertDebugUtilsLabelEXT(my_data, pLabelInfo);
+
+    if (!skip && my_data->dispatch_table.QueueInsertDebugUtilsLabelEXT) {
+        my_data->dispatch_table.QueueInsertDebugUtilsLabelEXT(queue, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL CmdBeginDebugUtilsLabelEXT(VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
+    assert(my_data != NULL);
+
+    skip |= parameter_validation_vkCmdBeginDebugUtilsLabelEXT(my_data, pLabelInfo);
+
+    if (!skip && my_data->dispatch_table.CmdBeginDebugUtilsLabelEXT) {
+        my_data->dispatch_table.CmdBeginDebugUtilsLabelEXT(commandBuffer, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL CmdEndDebugUtilsLabelEXT(VkCommandBuffer commandBuffer) {
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
+    assert(my_data != NULL);
+
+#if 0  // No generated validation for this command
+    skip |= parameter_validation_vkCmdEndDebugUtilsLabelEXT(my_data);
+#endif
+
+    if (!skip && my_data->dispatch_table.CmdEndDebugUtilsLabelEXT) {
+        my_data->dispatch_table.CmdEndDebugUtilsLabelEXT(commandBuffer);
+    }
+}
+
+VKAPI_ATTR void VKAPI_CALL CmdInsertDebugUtilsLabelEXT(VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT *pLabelInfo) {
+    bool skip = false;
+    auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
+    assert(my_data != NULL);
+
+    skip |= parameter_validation_vkCmdInsertDebugUtilsLabelEXT(my_data, pLabelInfo);
+
+    if (!skip && my_data->dispatch_table.CmdInsertDebugUtilsLabelEXT) {
+        my_data->dispatch_table.CmdInsertDebugUtilsLabelEXT(commandBuffer, pLabelInfo);
+    }
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL CreateDebugUtilsMessengerEXT(VkInstance instance,
+                                                            const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+                                                            const VkAllocationCallbacks *pAllocator,
+                                                            VkDebugUtilsMessengerEXT *pMessenger) {
+    instance_layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(instance), instance_layer_data_map);
+    VkResult result = instance_data->dispatch_table.CreateDebugUtilsMessengerEXT(instance, pCreateInfo, pAllocator, pMessenger);
+
+    if (VK_SUCCESS == result) {
+        result = layer_create_messenger_callback(instance_data->report_data, false, pCreateInfo, pAllocator, pMessenger);
+    }
+    return result;
+}
+
+VKAPI_ATTR void VKAPI_CALL DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT messenger,
+                                                         const VkAllocationCallbacks *pAllocator) {
+    instance_layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(instance), instance_layer_data_map);
+    instance_data->dispatch_table.DestroyDebugUtilsMessengerEXT(instance, messenger, pAllocator);
+    layer_destroy_messenger_callback(instance_data->report_data, messenger, pAllocator);
+}
+
+VKAPI_ATTR void VKAPI_CALL SubmitDebugUtilsMessageEXT(VkInstance instance, VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                      VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+                                                      const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData) {
+    instance_layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(instance), instance_layer_data_map);
+    instance_data->dispatch_table.SubmitDebugUtilsMessageEXT(instance, messageSeverity, messageTypes, pCallbackData);
+}
+
+// VK_EXT_debug_report commands
 VKAPI_ATTR VkResult VKAPI_CALL CreateDebugReportCallbackEXT(VkInstance instance,
                                                             const VkDebugReportCallbackCreateInfoEXT *pCreateInfo,
                                                             const VkAllocationCallbacks *pAllocator,
@@ -90,7 +233,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateDebugReportCallbackEXT(VkInstance instance,
     VkResult result = data->dispatch_table.CreateDebugReportCallbackEXT(instance, pCreateInfo, pAllocator, pMsgCallback);
 
     if (result == VK_SUCCESS) {
-        result = layer_create_msg_callback(data->report_data, false, pCreateInfo, pAllocator, pMsgCallback);
+        result = layer_create_report_callback(data->report_data, false, pCreateInfo, pAllocator, pMsgCallback);
     }
 
     return result;
@@ -101,7 +244,7 @@ VKAPI_ATTR void VKAPI_CALL DestroyDebugReportCallbackEXT(VkInstance instance, Vk
     auto data = GetLayerDataPtr(get_dispatch_key(instance), instance_layer_data_map);
     data->dispatch_table.DestroyDebugReportCallbackEXT(instance, msgCallback, pAllocator);
 
-    layer_destroy_msg_callback(data->report_data, msgCallback, pAllocator);
+    layer_destroy_report_callback(data->report_data, msgCallback, pAllocator);
 }
 
 VKAPI_ATTR void VKAPI_CALL DebugReportMessageEXT(VkInstance instance, VkDebugReportFlagsEXT flags,
@@ -111,7 +254,8 @@ VKAPI_ATTR void VKAPI_CALL DebugReportMessageEXT(VkInstance instance, VkDebugRep
     data->dispatch_table.DebugReportMessageEXT(instance, flags, objType, object, location, msgCode, pLayerPrefix, pMsg);
 }
 
-static const VkExtensionProperties instance_extensions[] = {{VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_SPEC_VERSION}};
+static const VkExtensionProperties instance_extensions[] = {{VK_EXT_DEBUG_REPORT_EXTENSION_NAME, VK_EXT_DEBUG_REPORT_SPEC_VERSION},
+                                                            {VK_EXT_DEBUG_UTILS_EXTENSION_NAME, VK_EXT_DEBUG_UTILS_SPEC_VERSION}};
 
 static const VkLayerProperties global_layer = {
     "VK_LAYER_LUNARG_parameter_validation", VK_LAYER_API_VERSION, 1, "LunarG Validation Layer",
@@ -231,21 +375,39 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
         layer_init_instance_dispatch_table(*pInstance, &my_instance_data->dispatch_table, fpGetInstanceProcAddr);
         my_instance_data->instance = *pInstance;
         my_instance_data->report_data =
-            debug_report_create_instance(&my_instance_data->dispatch_table, *pInstance, pCreateInfo->enabledExtensionCount,
-                                         pCreateInfo->ppEnabledExtensionNames);
+            debug_utils_create_instance(&my_instance_data->dispatch_table, *pInstance, pCreateInfo->enabledExtensionCount,
+                                        pCreateInfo->ppEnabledExtensionNames);
 
         // Look for one or more debug report create info structures
         // and setup a callback(s) for each one found.
-        if (!layer_copy_tmp_callbacks(pCreateInfo->pNext, &my_instance_data->num_tmp_callbacks,
-                                      &my_instance_data->tmp_dbg_create_infos, &my_instance_data->tmp_callbacks)) {
-            if (my_instance_data->num_tmp_callbacks > 0) {
+        if (!layer_copy_tmp_debug_messengers(pCreateInfo->pNext, &my_instance_data->num_tmp_debug_messengers,
+                                             &my_instance_data->tmp_messenger_create_infos,
+                                             &my_instance_data->tmp_debug_messengers)) {
+            if (my_instance_data->num_tmp_debug_messengers > 0) {
                 // Setup the temporary callback(s) here to catch early issues:
-                if (layer_enable_tmp_callbacks(my_instance_data->report_data, my_instance_data->num_tmp_callbacks,
-                                               my_instance_data->tmp_dbg_create_infos, my_instance_data->tmp_callbacks)) {
+                if (layer_enable_tmp_debug_messengers(my_instance_data->report_data, my_instance_data->num_tmp_debug_messengers,
+                                                      my_instance_data->tmp_messenger_create_infos,
+                                                      my_instance_data->tmp_debug_messengers)) {
                     // Failure of setting up one or more of the callback.
                     // Therefore, clean up and don't use those callbacks:
-                    layer_free_tmp_callbacks(my_instance_data->tmp_dbg_create_infos, my_instance_data->tmp_callbacks);
-                    my_instance_data->num_tmp_callbacks = 0;
+                    layer_free_tmp_debug_messengers(my_instance_data->tmp_messenger_create_infos,
+                                                    my_instance_data->tmp_debug_messengers);
+                    my_instance_data->num_tmp_debug_messengers = 0;
+                }
+            }
+        }
+        if (!layer_copy_tmp_report_callbacks(pCreateInfo->pNext, &my_instance_data->num_tmp_report_callbacks,
+                                             &my_instance_data->tmp_report_create_infos, &my_instance_data->tmp_report_callbacks)) {
+            if (my_instance_data->num_tmp_report_callbacks > 0) {
+                // Setup the temporary callback(s) here to catch early issues:
+                if (layer_enable_tmp_report_callbacks(my_instance_data->report_data, my_instance_data->num_tmp_report_callbacks,
+                                                      my_instance_data->tmp_report_create_infos,
+                                                      my_instance_data->tmp_report_callbacks)) {
+                    // Failure of setting up one or more of the callback.
+                    // Therefore, clean up and don't use those callbacks:
+                    layer_free_tmp_report_callbacks(my_instance_data->tmp_report_create_infos,
+                                                    my_instance_data->tmp_report_callbacks);
+                    my_instance_data->num_tmp_report_callbacks = 0;
                 }
             }
         }
@@ -271,9 +433,13 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateInstance(const VkInstanceCreateInfo *pCreat
         }
 
         // Disable the tmp callbacks:
-        if (my_instance_data->num_tmp_callbacks > 0) {
-            layer_disable_tmp_callbacks(my_instance_data->report_data, my_instance_data->num_tmp_callbacks,
-                                        my_instance_data->tmp_callbacks);
+        if (my_instance_data->num_tmp_debug_messengers > 0) {
+            layer_disable_tmp_debug_messengers(my_instance_data->report_data, my_instance_data->num_tmp_debug_messengers,
+                                               my_instance_data->tmp_debug_messengers);
+        }
+        if (my_instance_data->num_tmp_report_callbacks > 0) {
+            layer_disable_tmp_report_callbacks(my_instance_data->report_data, my_instance_data->num_tmp_report_callbacks,
+                                               my_instance_data->tmp_report_callbacks);
         }
     }
 
@@ -289,9 +455,15 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
 
     // Enable the temporary callback(s) here to catch vkDestroyInstance issues:
     bool callback_setup = false;
-    if (my_data->num_tmp_callbacks > 0) {
-        if (!layer_enable_tmp_callbacks(my_data->report_data, my_data->num_tmp_callbacks, my_data->tmp_dbg_create_infos,
-                                        my_data->tmp_callbacks)) {
+    if (my_data->num_tmp_debug_messengers > 0) {
+        if (!layer_enable_tmp_debug_messengers(my_data->report_data, my_data->num_tmp_debug_messengers,
+                                               my_data->tmp_messenger_create_infos, my_data->tmp_debug_messengers)) {
+            callback_setup = true;
+        }
+    }
+    if (my_data->num_tmp_report_callbacks > 0) {
+        if (!layer_enable_tmp_report_callbacks(my_data->report_data, my_data->num_tmp_report_callbacks,
+                                               my_data->tmp_report_create_infos, my_data->tmp_report_callbacks)) {
             callback_setup = true;
         }
     }
@@ -300,24 +472,34 @@ VKAPI_ATTR void VKAPI_CALL DestroyInstance(VkInstance instance, const VkAllocati
 
     // Disable and cleanup the temporary callback(s):
     if (callback_setup) {
-        layer_disable_tmp_callbacks(my_data->report_data, my_data->num_tmp_callbacks, my_data->tmp_callbacks);
+        layer_disable_tmp_debug_messengers(my_data->report_data, my_data->num_tmp_debug_messengers, my_data->tmp_debug_messengers);
+        layer_disable_tmp_report_callbacks(my_data->report_data, my_data->num_tmp_report_callbacks, my_data->tmp_report_callbacks);
     }
-    if (my_data->num_tmp_callbacks > 0) {
-        layer_free_tmp_callbacks(my_data->tmp_dbg_create_infos, my_data->tmp_callbacks);
-        my_data->num_tmp_callbacks = 0;
+    if (my_data->num_tmp_debug_messengers > 0) {
+        layer_free_tmp_debug_messengers(my_data->tmp_messenger_create_infos, my_data->tmp_debug_messengers);
+        my_data->num_tmp_debug_messengers = 0;
+    }
+    if (my_data->num_tmp_report_callbacks > 0) {
+        layer_free_tmp_report_callbacks(my_data->tmp_report_create_infos, my_data->tmp_report_callbacks);
+        my_data->num_tmp_report_callbacks = 0;
     }
 
     if (!skip) {
         my_data->dispatch_table.DestroyInstance(instance, pAllocator);
 
         // Clean up logging callback, if any
+        while (my_data->logging_messenger.size() > 0) {
+            VkDebugUtilsMessengerEXT messenger = my_data->logging_messenger.back();
+            layer_destroy_messenger_callback(my_data->report_data, messenger, pAllocator);
+            my_data->logging_messenger.pop_back();
+        }
         while (my_data->logging_callback.size() > 0) {
             VkDebugReportCallbackEXT callback = my_data->logging_callback.back();
-            layer_destroy_msg_callback(my_data->report_data, callback, pAllocator);
+            layer_destroy_report_callback(my_data->report_data, callback, pAllocator);
             my_data->logging_callback.pop_back();
         }
 
-        layer_debug_report_destroy_instance(my_data->report_data);
+        layer_debug_utils_destroy_instance(my_data->report_data);
     }
 
     FreeLayerDataPtr(key, instance_layer_data_map);
@@ -405,8 +587,8 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevi
     auto my_data = GetLayerDataPtr(get_dispatch_key(physicalDevice), instance_layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetPhysicalDeviceQueueFamilyProperties(my_data, pQueueFamilyPropertyCount,
-                                                                          pQueueFamilyProperties);
+    skip |=
+        parameter_validation_vkGetPhysicalDeviceQueueFamilyProperties(my_data, pQueueFamilyPropertyCount, pQueueFamilyProperties);
 
     if (!skip) {
         my_data->dispatch_table.GetPhysicalDeviceQueueFamilyProperties(physicalDevice, pQueueFamilyPropertyCount,
@@ -580,12 +762,11 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateDevice(VkPhysicalDevice physicalDevice, con
 
         validate_result(my_instance_data->report_data, "vkCreateDevice", {}, result);
 
-
         if (result == VK_SUCCESS) {
             layer_data *my_device_data = GetLayerDataPtr(get_dispatch_key(*pDevice), layer_data_map);
             assert(my_device_data != nullptr);
 
-            my_device_data->report_data = layer_debug_report_create_device(my_instance_data->report_data, *pDevice);
+            my_device_data->report_data = layer_debug_utils_create_device(my_instance_data->report_data, *pDevice);
             layer_init_device_dispatch_table(*pDevice, &my_device_data->dispatch_table, fpGetDeviceProcAddr);
 
             my_device_data->extensions.InitFromDeviceCreateInfo(&my_instance_data->extensions, pCreateInfo);
@@ -620,7 +801,7 @@ VKAPI_ATTR void VKAPI_CALL DestroyDevice(VkDevice device, const VkAllocationCall
     skip |= parameter_validation_vkDestroyDevice(my_data, pAllocator);
 
     if (!skip) {
-        layer_debug_report_destroy_device(device);
+        layer_debug_utils_destroy_device(device);
 
 #if DISPATCH_MAP_DEBUG
         fprintf(stderr, "Device:  0x%p, key:  0x%p\n", device, key);
@@ -941,8 +1122,8 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceSparseImageFormatProperties(VkPhysic
     auto my_data = GetLayerDataPtr(get_dispatch_key(physicalDevice), instance_layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetPhysicalDeviceSparseImageFormatProperties(my_data, format, type, samples, usage,
-                                                                                tiling, pPropertyCount, pProperties);
+    skip |= parameter_validation_vkGetPhysicalDeviceSparseImageFormatProperties(my_data, format, type, samples, usage, tiling,
+                                                                                pPropertyCount, pProperties);
 
     if (!skip) {
         my_data->dispatch_table.GetPhysicalDeviceSparseImageFormatProperties(physicalDevice, format, type, samples, usage, tiling,
@@ -1217,8 +1398,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetQueryPoolResults(VkDevice device, VkQueryPool 
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetQueryPoolResults(my_data, queryPool, firstQuery, queryCount, dataSize, pData,
-                                                       stride, flags);
+    skip |= parameter_validation_vkGetQueryPoolResults(my_data, queryPool, firstQuery, queryCount, dataSize, pData, stride, flags);
 
     if (!skip) {
         result =
@@ -1353,7 +1533,6 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateImage(VkDevice device, const VkImageCreateI
     skip |= parameter_validation_vkCreateImage(device_data, pCreateInfo, pAllocator, pImage);
 
     if (pCreateInfo != nullptr) {
-
         if ((device_data->physical_device_features.textureCompressionETC2 == false) &&
             FormatIsCompressed_ETC2_EAC(pCreateInfo->format)) {
             skip |= log_msg(report_data, VK_DEBUG_REPORT_ERROR_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, __LINE__,
@@ -1373,8 +1552,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateImage(VkDevice device, const VkImageCreateI
                         string_VkFormat(pCreateInfo->format));
         }
 
-        if ((device_data->physical_device_features.textureCompressionBC == false) &&
-            FormatIsCompressed_BC(pCreateInfo->format)) {
+        if ((device_data->physical_device_features.textureCompressionBC == false) && FormatIsCompressed_BC(pCreateInfo->format)) {
             skip |= log_msg(report_data, VK_DEBUG_REPORT_ERROR_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, __LINE__,
                             DEVICE_FEATURE, LayerName,
                             "vkCreateImage(): Attempting to create VkImage with format %s. The textureCompressionBC feature is "
@@ -2381,8 +2559,8 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateComputePipelines(VkDevice device, VkPipelin
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCreateComputePipelines(my_data, pipelineCache, createInfoCount, pCreateInfos,
-                                                          pAllocator, pPipelines);
+    skip |= parameter_validation_vkCreateComputePipelines(my_data, pipelineCache, createInfoCount, pCreateInfos, pAllocator,
+                                                          pPipelines);
     skip |= PreCreateComputePipelines(device, pCreateInfos);
 
     if (!skip) {
@@ -2448,7 +2626,6 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateSampler(VkDevice device, const VkSamplerCre
     skip |= parameter_validation_vkCreateSampler(device_data, pCreateInfo, pAllocator, pSampler);
 
     if (pCreateInfo != nullptr) {
-
         if ((device_data->physical_device_features.samplerAnisotropy == false) && (pCreateInfo->maxAnisotropy != 1.0)) {
             skip |= log_msg(report_data, VK_DEBUG_REPORT_ERROR_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, __LINE__,
                             DEVICE_FEATURE, LayerName,
@@ -3142,7 +3319,7 @@ static bool preCmdSetViewport(layer_data *my_data, uint32_t first_viewport, uint
 
             bool invalid_height = (viewport.height <= 0 || viewport.height > limits.maxViewportDimensions[1]);
             if ((my_data->extensions.vk_amd_negative_viewport_height || my_data->extensions.vk_khr_maintenance1) &&
-                (viewport.height < 0)) { // VALIDATION_ERROR_1500099c
+                (viewport.height < 0)) {  // VALIDATION_ERROR_1500099c
                 invalid_height = false;
             }
             if (invalid_height) {
@@ -3330,8 +3507,8 @@ VKAPI_ATTR void VKAPI_CALL CmdBindDescriptorSets(VkCommandBuffer commandBuffer, 
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdBindDescriptorSets(my_data, pipelineBindPoint, layout, firstSet,
-                                                         descriptorSetCount, pDescriptorSets, dynamicOffsetCount, pDynamicOffsets);
+    skip |= parameter_validation_vkCmdBindDescriptorSets(my_data, pipelineBindPoint, layout, firstSet, descriptorSetCount,
+                                                         pDescriptorSets, dynamicOffsetCount, pDynamicOffsets);
 
     if (!skip) {
         my_data->dispatch_table.CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout, firstSet, descriptorSetCount,
@@ -3500,8 +3677,7 @@ VKAPI_ATTR void VKAPI_CALL CmdCopyImage(VkCommandBuffer commandBuffer, VkImage s
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdCopyImage(my_data, srcImage, srcImageLayout, dstImage, dstImageLayout,
-                                                regionCount, pRegions);
+    skip |= parameter_validation_vkCmdCopyImage(my_data, srcImage, srcImageLayout, dstImage, dstImageLayout, regionCount, pRegions);
 
     if (!skip) {
         PreCmdCopyImage(commandBuffer, pRegions);
@@ -3540,8 +3716,8 @@ VKAPI_ATTR void VKAPI_CALL CmdBlitImage(VkCommandBuffer commandBuffer, VkImage s
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdBlitImage(my_data, srcImage, srcImageLayout, dstImage, dstImageLayout,
-                                                regionCount, pRegions, filter);
+    skip |= parameter_validation_vkCmdBlitImage(my_data, srcImage, srcImageLayout, dstImage, dstImageLayout, regionCount, pRegions,
+                                                filter);
 
     if (!skip) {
         PreCmdBlitImage(commandBuffer, pRegions);
@@ -3574,8 +3750,7 @@ VKAPI_ATTR void VKAPI_CALL CmdCopyBufferToImage(VkCommandBuffer commandBuffer, V
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdCopyBufferToImage(my_data, srcBuffer, dstImage, dstImageLayout, regionCount,
-                                                        pRegions);
+    skip |= parameter_validation_vkCmdCopyBufferToImage(my_data, srcBuffer, dstImage, dstImageLayout, regionCount, pRegions);
 
     if (!skip) {
         PreCmdCopyBufferToImage(commandBuffer, pRegions);
@@ -3606,8 +3781,7 @@ VKAPI_ATTR void VKAPI_CALL CmdCopyImageToBuffer(VkCommandBuffer commandBuffer, V
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdCopyImageToBuffer(my_data, srcImage, srcImageLayout, dstBuffer, regionCount,
-                                                        pRegions);
+    skip |= parameter_validation_vkCmdCopyImageToBuffer(my_data, srcImage, srcImageLayout, dstBuffer, regionCount, pRegions);
 
     if (!skip) {
         PreCmdCopyImageToBuffer(commandBuffer, pRegions);
@@ -3632,11 +3806,11 @@ VKAPI_ATTR void VKAPI_CALL CmdUpdateBuffer(VkCommandBuffer commandBuffer, VkBuff
     }
 
     if ((dataSize <= 0) || (dataSize > 65536)) {
-        skip |= log_msg(my_data->report_data, VK_DEBUG_REPORT_ERROR_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, __LINE__,
-                        VALIDATION_ERROR_1e40004a, LayerName,
-                        "vkCmdUpdateBuffer() parameter, VkDeviceSize dataSize (0x%" PRIxLEAST64
-                        "), must be greater than zero and less than or equal to 65536. %s",
-                        dataSize, validation_error_map[VALIDATION_ERROR_1e40004a]);
+        skip |=
+            log_msg(my_data->report_data, VK_DEBUG_REPORT_ERROR_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, __LINE__,
+                    VALIDATION_ERROR_1e40004a, LayerName, "vkCmdUpdateBuffer() parameter, VkDeviceSize dataSize (0x%" PRIxLEAST64
+                                                          "), must be greater than zero and less than or equal to 65536. %s",
+                    dataSize, validation_error_map[VALIDATION_ERROR_1e40004a]);
     } else if (dataSize & 3) {
         skip |= log_msg(my_data->report_data, VK_DEBUG_REPORT_ERROR_BIT_EXT, VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, 0, __LINE__,
                         VALIDATION_ERROR_1e40004c, LayerName,
@@ -3704,8 +3878,7 @@ VKAPI_ATTR void VKAPI_CALL CmdClearDepthStencilImage(VkCommandBuffer commandBuff
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdClearDepthStencilImage(my_data, image, imageLayout, pDepthStencil, rangeCount,
-                                                             pRanges);
+    skip |= parameter_validation_vkCmdClearDepthStencilImage(my_data, image, imageLayout, pDepthStencil, rangeCount, pRanges);
 
     if (!skip) {
         my_data->dispatch_table.CmdClearDepthStencilImage(commandBuffer, image, imageLayout, pDepthStencil, rangeCount, pRanges);
@@ -3757,8 +3930,8 @@ VKAPI_ATTR void VKAPI_CALL CmdResolveImage(VkCommandBuffer commandBuffer, VkImag
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdResolveImage(my_data, srcImage, srcImageLayout, dstImage, dstImageLayout,
-                                                   regionCount, pRegions);
+    skip |=
+        parameter_validation_vkCmdResolveImage(my_data, srcImage, srcImageLayout, dstImage, dstImageLayout, regionCount, pRegions);
 
     if (!skip) {
         PreCmdResolveImage(commandBuffer, pRegions);
@@ -3801,9 +3974,9 @@ VKAPI_ATTR void VKAPI_CALL CmdWaitEvents(VkCommandBuffer commandBuffer, uint32_t
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdWaitEvents(my_data, eventCount, pEvents, srcStageMask, dstStageMask,
-                                                 memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount,
-                                                 pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers);
+    skip |= parameter_validation_vkCmdWaitEvents(my_data, eventCount, pEvents, srcStageMask, dstStageMask, memoryBarrierCount,
+                                                 pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers,
+                                                 imageMemoryBarrierCount, pImageMemoryBarriers);
 
     if (!skip) {
         my_data->dispatch_table.CmdWaitEvents(commandBuffer, eventCount, pEvents, srcStageMask, dstStageMask, memoryBarrierCount,
@@ -3821,9 +3994,9 @@ VKAPI_ATTR void VKAPI_CALL CmdPipelineBarrier(VkCommandBuffer commandBuffer, VkP
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdPipelineBarrier(my_data, srcStageMask, dstStageMask, dependencyFlags,
-                                                      memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount,
-                                                      pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers);
+    skip |= parameter_validation_vkCmdPipelineBarrier(my_data, srcStageMask, dstStageMask, dependencyFlags, memoryBarrierCount,
+                                                      pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers,
+                                                      imageMemoryBarrierCount, pImageMemoryBarriers);
 
     if (!skip) {
         my_data->dispatch_table.CmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, dependencyFlags, memoryBarrierCount,
@@ -3890,8 +4063,8 @@ VKAPI_ATTR void VKAPI_CALL CmdCopyQueryPoolResults(VkCommandBuffer commandBuffer
     layer_data *my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdCopyQueryPoolResults(my_data, queryPool, firstQuery, queryCount, dstBuffer,
-                                                           dstOffset, stride, flags);
+    skip |= parameter_validation_vkCmdCopyQueryPoolResults(my_data, queryPool, firstQuery, queryCount, dstBuffer, dstOffset, stride,
+                                                           flags);
 
     if (!skip) {
         my_data->dispatch_table.CmdCopyQueryPoolResults(commandBuffer, queryPool, firstQuery, queryCount, dstBuffer, dstOffset,
@@ -4225,8 +4398,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevi
     auto my_data = GetLayerDataPtr(get_dispatch_key(physicalDevice), instance_layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetPhysicalDeviceSurfaceFormatsKHR(my_data, surface, pSurfaceFormatCount,
-                                                                      pSurfaceFormats);
+    skip |= parameter_validation_vkGetPhysicalDeviceSurfaceFormatsKHR(my_data, surface, pSurfaceFormatCount, pSurfaceFormats);
 
     if (!skip) {
         result = my_data->dispatch_table.GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount,
@@ -4246,8 +4418,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfacePresentModesKHR(VkPhysica
     auto my_data = GetLayerDataPtr(get_dispatch_key(physicalDevice), instance_layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetPhysicalDeviceSurfacePresentModesKHR(my_data, surface, pPresentModeCount,
-                                                                           pPresentModes);
+    skip |= parameter_validation_vkGetPhysicalDeviceSurfacePresentModesKHR(my_data, surface, pPresentModeCount, pPresentModes);
 
     if (!skip) {
         result = my_data->dispatch_table.GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount,
@@ -4343,8 +4514,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL GetPhysicalDeviceXcbPresentationSupportKHR(VkPhys
     assert(my_data != NULL);
     bool skip = false;
 
-    skip |= parameter_validation_vkGetPhysicalDeviceXcbPresentationSupportKHR(my_data, queueFamilyIndex, connection,
-                                                                              visual_id);
+    skip |= parameter_validation_vkGetPhysicalDeviceXcbPresentationSupportKHR(my_data, queueFamilyIndex, connection, visual_id);
 
     if (!skip) {
         result = my_data->dispatch_table.GetPhysicalDeviceXcbPresentationSupportKHR(physicalDevice, queueFamilyIndex, connection,
@@ -4384,8 +4554,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL GetPhysicalDeviceXlibPresentationSupportKHR(VkPhy
     assert(my_data != NULL);
     bool skip = false;
 
-    skip |=
-        parameter_validation_vkGetPhysicalDeviceXlibPresentationSupportKHR(my_data, queueFamilyIndex, dpy, visualID);
+    skip |= parameter_validation_vkGetPhysicalDeviceXlibPresentationSupportKHR(my_data, queueFamilyIndex, dpy, visualID);
 
     if (!skip) {
         result =
@@ -4501,8 +4670,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateSharedSwapchainsKHR(VkDevice device, uint32
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCreateSharedSwapchainsKHR(my_data, swapchainCount, pCreateInfos, pAllocator,
-                                                             pSwapchains);
+    skip |= parameter_validation_vkCreateSharedSwapchainsKHR(my_data, swapchainCount, pCreateInfos, pAllocator, pSwapchains);
 
     if (!skip) {
         result = my_data->dispatch_table.CreateSharedSwapchainsKHR(device, swapchainCount, pCreateInfos, pAllocator, pSwapchains);
@@ -4688,8 +4856,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceImageFormatProperties2KHR(
     auto my_data = GetLayerDataPtr(get_dispatch_key(physicalDevice), instance_layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetPhysicalDeviceImageFormatProperties2KHR(my_data, pImageFormatInfo,
-                                                                              pImageFormatProperties);
+    skip |= parameter_validation_vkGetPhysicalDeviceImageFormatProperties2KHR(my_data, pImageFormatInfo, pImageFormatProperties);
 
     if (!skip) {
         result = my_data->dispatch_table.GetPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo,
@@ -4759,8 +4926,8 @@ VKAPI_ATTR void VKAPI_CALL GetPhysicalDeviceSparseImageFormatProperties2KHR(
     auto my_data = GetLayerDataPtr(get_dispatch_key(physicalDevice), instance_layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetPhysicalDeviceSparseImageFormatProperties2KHR(my_data, pFormatInfo,
-                                                                                    pPropertyCount, pProperties);
+    skip |=
+        parameter_validation_vkGetPhysicalDeviceSparseImageFormatProperties2KHR(my_data, pFormatInfo, pPropertyCount, pProperties);
 
     if (!skip) {
         my_data->dispatch_table.GetPhysicalDeviceSparseImageFormatProperties2KHR(physicalDevice, pFormatInfo, pPropertyCount,
@@ -4792,8 +4959,8 @@ VKAPI_ATTR void VKAPI_CALL CmdPushDescriptorSetKHR(VkCommandBuffer commandBuffer
     auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdPushDescriptorSetKHR(my_data, pipelineBindPoint, layout, set,
-                                                           descriptorWriteCount, pDescriptorWrites);
+    skip |= parameter_validation_vkCmdPushDescriptorSetKHR(my_data, pipelineBindPoint, layout, set, descriptorWriteCount,
+                                                           pDescriptorWrites);
 
     if (!skip) {
         my_data->dispatch_table.CmdPushDescriptorSetKHR(commandBuffer, pipelineBindPoint, layout, set, descriptorWriteCount,
@@ -4812,8 +4979,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateDescriptorUpdateTemplateKHR(VkDevice device
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCreateDescriptorUpdateTemplateKHR(my_data, pCreateInfo, pAllocator,
-                                                                     pDescriptorUpdateTemplate);
+    skip |= parameter_validation_vkCreateDescriptorUpdateTemplateKHR(my_data, pCreateInfo, pAllocator, pDescriptorUpdateTemplate);
 
     if (!skip) {
         result =
@@ -4845,8 +5011,7 @@ VKAPI_ATTR void VKAPI_CALL UpdateDescriptorSetWithTemplateKHR(VkDevice device, V
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkUpdateDescriptorSetWithTemplateKHR(my_data, descriptorSet, descriptorUpdateTemplate,
-                                                                      pData);
+    skip |= parameter_validation_vkUpdateDescriptorSetWithTemplateKHR(my_data, descriptorSet, descriptorUpdateTemplate, pData);
 
     if (!skip) {
         my_data->dispatch_table.UpdateDescriptorSetWithTemplateKHR(device, descriptorSet, descriptorUpdateTemplate, pData);
@@ -4860,8 +5025,7 @@ VKAPI_ATTR void VKAPI_CALL CmdPushDescriptorSetWithTemplateKHR(VkCommandBuffer c
     auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdPushDescriptorSetWithTemplateKHR(my_data, descriptorUpdateTemplate, layout, set,
-                                                                       pData);
+    skip |= parameter_validation_vkCmdPushDescriptorSetWithTemplateKHR(my_data, descriptorUpdateTemplate, layout, set, pData);
 
     if (!skip) {
         my_data->dispatch_table.CmdPushDescriptorSetWithTemplateKHR(commandBuffer, descriptorUpdateTemplate, layout, set, pData);
@@ -4888,8 +5052,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPhysicalDeviceSurfaceCapabilities2KHR(VkPhysic
     instance_layer_data *instance_data = GetLayerDataPtr(get_dispatch_key(physicalDevice), instance_layer_data_map);
     VkResult result = VK_ERROR_VALIDATION_FAILED_EXT;
 
-    skip = parameter_validation_vkGetPhysicalDeviceSurfaceCapabilities2KHR(instance_data, pSurfaceInfo,
-                                                                           pSurfaceCapabilities);
+    skip = parameter_validation_vkGetPhysicalDeviceSurfaceCapabilities2KHR(instance_data, pSurfaceInfo, pSurfaceCapabilities);
 
     if (!skip) {
         result = instance_data->dispatch_table.GetPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice, pSurfaceInfo,
@@ -4923,8 +5086,8 @@ VKAPI_ATTR VkResult VKAPI_CALL EnumeratePhysicalDeviceGroupsKHX(
     auto my_data = GetLayerDataPtr(get_dispatch_key(instance), instance_layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkEnumeratePhysicalDeviceGroupsKHX(my_data, pPhysicalDeviceGroupCount,
-                                                                    pPhysicalDeviceGroupProperties);
+    skip |=
+        parameter_validation_vkEnumeratePhysicalDeviceGroupsKHX(my_data, pPhysicalDeviceGroupCount, pPhysicalDeviceGroupProperties);
 
     if (!skip) {
         result = my_data->dispatch_table.EnumeratePhysicalDeviceGroupsKHX(instance, pPhysicalDeviceGroupCount,
@@ -4943,8 +5106,8 @@ VKAPI_ATTR void VKAPI_CALL GetDeviceGroupPeerMemoryFeaturesKHX(VkDevice device, 
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetDeviceGroupPeerMemoryFeaturesKHX(my_data, heapIndex, localDeviceIndex,
-                                                                       remoteDeviceIndex, pPeerMemoryFeatures);
+    skip |= parameter_validation_vkGetDeviceGroupPeerMemoryFeaturesKHX(my_data, heapIndex, localDeviceIndex, remoteDeviceIndex,
+                                                                       pPeerMemoryFeatures);
 
     if (!skip) {
         my_data->dispatch_table.GetDeviceGroupPeerMemoryFeaturesKHX(device, heapIndex, localDeviceIndex, remoteDeviceIndex,
@@ -5160,8 +5323,7 @@ VKAPI_ATTR VkResult VKAPI_CALL GetMemoryWin32HandlePropertiesKHX(VkDevice device
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkGetMemoryWin32HandlePropertiesKHX(my_data, handleType, handle,
-                                                                     pMemoryWin32HandleProperties);
+    skip |= parameter_validation_vkGetMemoryWin32HandlePropertiesKHX(my_data, handleType, handle, pMemoryWin32HandleProperties);
 
     if (!skip) {
         result =
@@ -5379,8 +5541,8 @@ VKAPI_ATTR void VKAPI_CALL CmdSetDiscardRectangleEXT(VkCommandBuffer commandBuff
     auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdSetDiscardRectangleEXT(my_data, firstDiscardRectangle,
-                                                             discardRectangleCount, pDiscardRectangles);
+    skip |=
+        parameter_validation_vkCmdSetDiscardRectangleEXT(my_data, firstDiscardRectangle, discardRectangleCount, pDiscardRectangles);
 
     if (!skip && my_data->dispatch_table.CmdSetDiscardRectangleEXT) {
         my_data->dispatch_table.CmdSetDiscardRectangleEXT(commandBuffer, firstDiscardRectangle, discardRectangleCount,
@@ -5484,8 +5646,8 @@ VKAPI_ATTR void VKAPI_CALL CmdDrawIndirectCountAMD(VkCommandBuffer commandBuffer
     auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdDrawIndirectCountAMD(my_data, buffer, offset, countBuffer, countBufferOffset,
-                                                           maxDrawCount, stride);
+    skip |= parameter_validation_vkCmdDrawIndirectCountAMD(my_data, buffer, offset, countBuffer, countBufferOffset, maxDrawCount,
+                                                           stride);
     if (!skip) {
         my_data->dispatch_table.CmdDrawIndirectCountAMD(commandBuffer, buffer, offset, countBuffer, countBufferOffset, maxDrawCount,
                                                         stride);
@@ -5499,8 +5661,8 @@ VKAPI_ATTR void VKAPI_CALL CmdDrawIndexedIndirectCountAMD(VkCommandBuffer comman
     auto my_data = GetLayerDataPtr(get_dispatch_key(commandBuffer), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCmdDrawIndexedIndirectCountAMD(my_data, buffer, offset, countBuffer,
-                                                                  countBufferOffset, maxDrawCount, stride);
+    skip |= parameter_validation_vkCmdDrawIndexedIndirectCountAMD(my_data, buffer, offset, countBuffer, countBufferOffset,
+                                                                  maxDrawCount, stride);
     if (!skip) {
         my_data->dispatch_table.CmdDrawIndexedIndirectCountAMD(commandBuffer, buffer, offset, countBuffer, countBufferOffset,
                                                                maxDrawCount, stride);
@@ -5617,8 +5779,7 @@ VKAPI_ATTR VkResult VKAPI_CALL CreateIndirectCommandsLayoutNVX(VkDevice device,
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkCreateIndirectCommandsLayoutNVX(my_data, pCreateInfo, pAllocator,
-                                                                   pIndirectCommandsLayout);
+    skip |= parameter_validation_vkCreateIndirectCommandsLayoutNVX(my_data, pCreateInfo, pAllocator, pIndirectCommandsLayout);
     if (!skip) {
         result = my_data->dispatch_table.CreateIndirectCommandsLayoutNVX(device, pCreateInfo, pAllocator, pIndirectCommandsLayout);
         validate_result(my_data->report_data, "vkCreateIndirectCommandsLayoutNVX", {}, result);
@@ -5675,8 +5836,7 @@ VKAPI_ATTR VkResult VKAPI_CALL RegisterObjectsNVX(VkDevice device, VkObjectTable
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkRegisterObjectsNVX(my_data, objectTable, objectCount, ppObjectTableEntries,
-                                                      pObjectIndices);
+    skip |= parameter_validation_vkRegisterObjectsNVX(my_data, objectTable, objectCount, ppObjectTableEntries, pObjectIndices);
     if (!skip) {
         result = my_data->dispatch_table.RegisterObjectsNVX(device, objectTable, objectCount, ppObjectTableEntries, pObjectIndices);
         validate_result(my_data->report_data, "vkRegisterObjectsNVX", {}, result);
@@ -5691,8 +5851,7 @@ VKAPI_ATTR VkResult VKAPI_CALL UnregisterObjectsNVX(VkDevice device, VkObjectTab
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
 
-    skip |= parameter_validation_vkUnregisterObjectsNVX(my_data, objectTable, objectCount, pObjectEntryTypes,
-                                                        pObjectIndices);
+    skip |= parameter_validation_vkUnregisterObjectsNVX(my_data, objectTable, objectCount, pObjectEntryTypes, pObjectIndices);
     if (!skip) {
         result = my_data->dispatch_table.UnregisterObjectsNVX(device, objectTable, objectCount, pObjectEntryTypes, pObjectIndices);
         validate_result(my_data->report_data, "vkUnregisterObjectsNVX", {}, result);
@@ -5719,8 +5878,8 @@ VKAPI_ATTR VkResult VKAPI_CALL GetPastPresentationTimingGOOGLE(VkDevice device, 
     bool skip = false;
     auto my_data = GetLayerDataPtr(get_dispatch_key(device), layer_data_map);
     assert(my_data != NULL);
-    skip |= parameter_validation_vkGetPastPresentationTimingGOOGLE(my_data, swapchain, pPresentationTimingCount,
-                                                                   pPresentationTimings);
+    skip |=
+        parameter_validation_vkGetPastPresentationTimingGOOGLE(my_data, swapchain, pPresentationTimingCount, pPresentationTimings);
     if (!skip) {
         result = my_data->dispatch_table.GetPastPresentationTimingGOOGLE(device, swapchain, pPresentationTimingCount,
                                                                          pPresentationTimings);
