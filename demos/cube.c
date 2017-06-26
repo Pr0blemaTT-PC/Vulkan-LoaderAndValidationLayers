@@ -443,37 +443,43 @@ struct demo {
     bool suppress_popups;
     PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback;
     PFN_vkDestroyDebugReportCallbackEXT DestroyDebugReportCallback;
-    VkDebugReportCallbackEXT msg_callback;
     PFN_vkDebugReportMessageEXT DebugReportMessage;
+    VkDebugReportCallbackEXT msg_callback;
+
+    PFN_vkCreateDebugUtilsMessengerEXT CreateDebugUtilsMessengerEXT;
+    PFN_vkDestroyDebugUtilsMessengerEXT DestroyDebugUtilsMessengerEXT;
+    PFN_vkSubmitDebugUtilsMessageEXT SubmitDebugUtilsMessageEXT;
+    VkDebugUtilsMessengerEXT dbg_messenger;
 
     uint32_t current_buffer;
     uint32_t queue_family_count;
 };
 
-VKAPI_ATTR VkBool32 VKAPI_CALL dbgFunc(VkFlags msgFlags, VkDebugReportObjectTypeEXT objType, uint64_t srcObject, size_t location,
-                                       int32_t msgCode, const char *pLayerPrefix, const char *pMsg, void *pUserData) {
+VKAPI_ATTR VkBool32 VKAPI_CALL dbg_report_callback_func(VkFlags msgFlags, VkDebugReportObjectTypeEXT objType, uint64_t srcObject,
+                                                        size_t location, int32_t msgCode, const char *pLayerPrefix,
+                                                        const char *pMsg, void *pUserData) {
     // clang-format off
     char *message = (char *)malloc(strlen(pMsg) + 100);
 
     assert(message);
 
     if (msgFlags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
-        sprintf(message, "INFORMATION: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
+        sprintf(message, "{DebugReport} INFORMATION: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
         validation_error = 1;
     } else if (msgFlags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
-        sprintf(message, "WARNING: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
+        sprintf(message, "{DebugReport} WARNING: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
         validation_error = 1;
     } else if (msgFlags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
-        sprintf(message, "PERFORMANCE WARNING: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
+        sprintf(message, "{DebugReport} PERFORMANCE WARNING: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
         validation_error = 1;
     } else if (msgFlags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
-        sprintf(message, "ERROR: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
+        sprintf(message, "{DebugReport} ERROR: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
         validation_error = 1;
     } else if (msgFlags & VK_DEBUG_REPORT_DEBUG_BIT_EXT) {
-        sprintf(message, "DEBUG: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
+        sprintf(message, "{DebugReport} DEBUG: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
         validation_error = 1;
     } else {
-        sprintf(message, "INFORMATION: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
+        sprintf(message, "{DebugReport} INFORMATION: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
         validation_error = 1;
     }
 
@@ -481,7 +487,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL dbgFunc(VkFlags msgFlags, VkDebugReportObjectType
 
     in_callback = true;
     struct demo *demo = (struct demo*) pUserData;
-    if (!demo->suppress_popups)
         MessageBox(NULL, message, "Alert", MB_OK);
     in_callback = false;
 
@@ -519,6 +524,80 @@ VKAPI_ATTR VkBool32 VKAPI_CALL dbgFunc(VkFlags msgFlags, VkDebugReportObjectType
     * That's what would happen without validation layers, so we'll
     * keep that behavior here.
     */
+    return false;
+}
+
+VKAPI_ATTR VkBool32 VKAPI_CALL debug_messenger_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT                  messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT*      pCallbackData,
+    void*                                       pUserData) {
+    char prefix[64];
+    char *message = (char *)malloc(strlen(pCallbackData->pMessage) + 150);
+    assert(message);
+    
+    if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT) {
+        strcpy(prefix, "{DebugUtilsMessenger} VERBOSE : ");
+    } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT) {
+        strcpy(prefix, "{DebugUtilsMessenger} INFO : ");
+    } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+        strcpy(prefix, "{DebugUtilsMessenger} WARNING : ");
+    } else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+        strcpy(prefix, "{DebugUtilsMessenger} ERROR : ");
+    }
+
+    if (messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) {
+        strcat(prefix, "GENERAL");
+    } else {
+        if (messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT) {
+            strcat(prefix, "SPEC");
+            validation_error = 1;
+        }
+        if (messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) {
+            if (messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT) {
+                strcat(prefix, "|");
+            }
+            strcat(prefix, "PERF");
+        }
+    }
+
+    sprintf(message, "%s - [%s] Code %d : %s", prefix, pCallbackData->pMessageSource, pCallbackData->messageNumber, pCallbackData->pMessage);
+
+
+#ifdef _WIN32
+
+    in_callback = true;
+    struct demo *demo = (struct demo*) pUserData;
+    if (!demo->suppress_popups)
+        MessageBox(NULL, message, "Alert", MB_OK);
+    in_callback = false;
+
+#elif defined(ANDROID)
+
+    if (msgFlags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
+        __android_log_print(ANDROID_LOG_INFO,  APP_SHORT_NAME, "%s", message);
+    } else if (msgFlags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
+        __android_log_print(ANDROID_LOG_WARN,  APP_SHORT_NAME, "%s", message);
+    } else if (msgFlags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
+        __android_log_print(ANDROID_LOG_WARN,  APP_SHORT_NAME, "%s", message);
+    } else if (msgFlags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+        __android_log_print(ANDROID_LOG_ERROR, APP_SHORT_NAME, "%s", message);
+    } else if (msgFlags & VK_DEBUG_REPORT_DEBUG_BIT_EXT) {
+        __android_log_print(ANDROID_LOG_DEBUG, APP_SHORT_NAME, "%s", message);
+    } else {
+        __android_log_print(ANDROID_LOG_INFO,  APP_SHORT_NAME, "%s", message);
+    }
+
+#else
+
+    printf("%s\n", message);
+    fflush(stdout);
+
+#endif
+
+    free(message);
+
+    // Don't bail out, but keep going.
     return false;
 }
 
@@ -2393,6 +2472,7 @@ static void demo_cleanup(struct demo *demo) {
     vkDestroyDevice(demo->device, NULL);
     if (demo->validate) {
         demo->DestroyDebugReportCallback(demo->inst, demo->msg_callback, NULL);
+        demo->DestroyDebugUtilsMessengerEXT(demo->inst, demo->dbg_messenger, NULL);
     }
     vkDestroySurfaceKHR(demo->inst, demo->surface, NULL);
 
@@ -3152,6 +3232,13 @@ static void demo_init_vk(struct demo *demo) {
                         VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
                 }
             }
+            if (!strcmp(VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+                        instance_extensions[i].extensionName)) {
+                if (demo->validate) {
+                    demo->extension_names[demo->enabled_extension_count++] =
+                        VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+                }
+            }
             assert(demo->enabled_extension_count < 64);
         }
 
@@ -3257,15 +3344,30 @@ static void demo_init_vk(struct demo *demo) {
      * After the instance is created, we use the instance-based
      * function to register the final callback.
      */
+    VkDebugUtilsMessengerCreateInfoEXT dbg_messenger_create_info;
     VkDebugReportCallbackCreateInfoEXT dbgCreateInfoTemp;
     VkValidationFlagsEXT val_flags;
     if (demo->validate) {
+        // VK_EXT_debug_utils style
+        dbg_messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        dbg_messenger_create_info.flags = 0;
+        dbg_messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                                    VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        dbg_messenger_create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                                VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT |
+                                                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        dbg_messenger_create_info.pfnUserCallback = debug_messenger_callback;
+        dbg_messenger_create_info.pUserData = demo;
+        inst_info.pNext = &dbg_messenger_create_info;
+
+        // VK_EXT_debug_report style
         dbgCreateInfoTemp.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
         dbgCreateInfoTemp.pNext = NULL;
-        dbgCreateInfoTemp.pfnCallback = demo->use_break ? BreakCallback : dbgFunc;
+        dbgCreateInfoTemp.pfnCallback = demo->use_break ? BreakCallback : dbg_report_callback_func;
         dbgCreateInfoTemp.pUserData = demo;
         dbgCreateInfoTemp.flags =
             VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+        dbg_messenger_create_info.pNext = &dbgCreateInfoTemp;
         if (demo->validate_checks_disabled) {
             val_flags.sType = VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT;
             val_flags.pNext = NULL;
@@ -3274,7 +3376,6 @@ static void demo_init_vk(struct demo *demo) {
             val_flags.pDisabledValidationChecks = &disabled_check;
             dbgCreateInfoTemp.pNext = (void*)&val_flags;
         }
-        inst_info.pNext = &dbgCreateInfoTemp;
     }
 
     uint32_t gpu_count;
@@ -3398,33 +3499,70 @@ static void demo_init_vk(struct demo *demo) {
     }
 
     if (demo->validate) {
+        // Setup VK_EXT_debug_utils
+        demo->CreateDebugUtilsMessengerEXT =
+            (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+                demo->inst, "vkCreateDebugUtilsMessengerEXT");
+        demo->DestroyDebugUtilsMessengerEXT =
+            (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+                demo->inst, "vkDestroyDebugUtilsMessengerEXT");
+        demo->SubmitDebugUtilsMessageEXT =
+            (PFN_vkSubmitDebugUtilsMessageEXT)vkGetInstanceProcAddr(
+                demo->inst, "vkSubmitDebugUtilsMessageEXT");
+        if (NULL == demo->CreateDebugUtilsMessengerEXT ||
+            NULL == demo->DestroyDebugUtilsMessengerEXT ||
+            NULL == demo->SubmitDebugUtilsMessageEXT) {
+            ERR_EXIT(
+                "GetProcAddr: Failed to init VK_EXT_debug_utils\n",
+                "GetProcAddr: Failure");
+        }
+        VkDebugUtilsMessengerCreateInfoEXT dbg_messenger_create_info;
+        dbg_messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        dbg_messenger_create_info.pNext = NULL;
+        dbg_messenger_create_info.flags = 0;
+        dbg_messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                                    VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        dbg_messenger_create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                                VK_DEBUG_UTILS_MESSAGE_TYPE_SPECIFICATION_BIT_EXT |
+                                                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        dbg_messenger_create_info.pfnUserCallback = debug_messenger_callback;
+        dbg_messenger_create_info.pUserData = demo;
+        err = demo->CreateDebugUtilsMessengerEXT(demo->inst, &dbg_messenger_create_info, NULL,
+                                              &demo->dbg_messenger);
+        switch (err) {
+        case VK_SUCCESS:
+            break;
+        case VK_ERROR_OUT_OF_HOST_MEMORY:
+            ERR_EXIT("CreateDebugUtilsMessengerEXT: out of host memory\n",
+                     "CreateDebugUtilsMessengerEXT Failure");
+            break;
+        default:
+            ERR_EXIT("CreateDebugUtilsMessengerEXT: unknown failure\n",
+                     "CreateDebugUtilsMessengerEXT Failure");
+            break;
+        }
+
+        // Setup VK_EXT_debug_report
         demo->CreateDebugReportCallback =
             (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(
                 demo->inst, "vkCreateDebugReportCallbackEXT");
         demo->DestroyDebugReportCallback =
             (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(
                 demo->inst, "vkDestroyDebugReportCallbackEXT");
-        if (!demo->CreateDebugReportCallback) {
-            ERR_EXIT(
-                "GetProcAddr: Unable to find vkCreateDebugReportCallbackEXT\n",
-                "vkGetProcAddr Failure");
-        }
-        if (!demo->DestroyDebugReportCallback) {
-            ERR_EXIT(
-                "GetProcAddr: Unable to find vkDestroyDebugReportCallbackEXT\n",
-                "vkGetProcAddr Failure");
-        }
         demo->DebugReportMessage =
             (PFN_vkDebugReportMessageEXT)vkGetInstanceProcAddr(
                 demo->inst, "vkDebugReportMessageEXT");
-        if (!demo->DebugReportMessage) {
-            ERR_EXIT("GetProcAddr: Unable to find vkDebugReportMessageEXT\n",
-                     "vkGetProcAddr Failure");
+        if (NULL == demo->CreateDebugReportCallback ||
+            NULL == demo->DestroyDebugReportCallback ||
+            NULL == demo->DebugReportMessage) {
+            ERR_EXIT(
+                "GetProcAddr: Failed to init VK_EXT_debug_report\n",
+                "GetProcAddr: Failure");
         }
 
         VkDebugReportCallbackCreateInfoEXT dbgCreateInfo;
         PFN_vkDebugReportCallbackEXT callback;
-        callback = demo->use_break ? BreakCallback : dbgFunc;
+        callback = demo->use_break ? BreakCallback : dbg_report_callback_func;
         dbgCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
         dbgCreateInfo.pNext = NULL;
         dbgCreateInfo.pfnCallback = callback;
